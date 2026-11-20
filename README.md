@@ -12,6 +12,20 @@ interfaces, with **Terran**, **Zerg** and **Protoss** skins in three eras:
 Swap `terran` for `zerg` or `protoss`. Open `index.html` for a live gallery of every component
 (pick a theme from the dropdown, or link to `?theme=hd-zerg`, `?theme=sc2-protoss`, …).
 
+## Screenshots
+
+**Classic — Terran** (`?theme=terran`)
+
+![Classic Terran theme](screenshots/terran.png)
+
+**Modern — Zerg** (`?theme=hd-zerg`)
+
+![Modern Zerg theme](screenshots/hd-zerg.png)
+
+**StarCraft II — Protoss** (`?theme=sc2-protoss`)
+
+![StarCraft II Protoss theme](screenshots/sc2-protoss.png)
+
 ## Install
 
 ```html
