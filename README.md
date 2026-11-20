@@ -9,6 +9,8 @@ interfaces, with **Terran**, **Zerg** and **Protoss** skins in three eras:
 | Modern | `sc sc-hd sc-terran` | The same SC1 skins with modern type, anti-aliasing and depth |
 | StarCraft II | `sc sc2 sc2-terran` | StarCraft II HUD: 5×3 command card, SC2 palette and frames |
 
+**Live demo:** https://davudk.github.io/starcraft-ui/
+
 Swap `terran` for `zerg` or `protoss`. Open `index.html` for a live gallery of every component
 (pick a theme from the dropdown, or link to `?theme=hd-zerg`, `?theme=sc2-protoss`, …).
 
