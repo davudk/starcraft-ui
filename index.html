@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StarCraft UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fonts used by the themes: Pixelify Sans (classic), Chakra Petch + Rajdhani (modern), Exo 2 + Michroma + Saira Condensed + Orbitron (StarCraft II) -->
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Michroma&family=Orbitron:wght@500;700&family=Pixelify+Sans:wght@400;600&family=Rajdhani:wght@500;600;700&family=Saira+Condensed:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dist/starcraft.css">
+<style>
+  html, body { margin: 0; background: #000; }
+  .demo { max-width: 1100px; margin: 0 auto; padding: 24px 16px 80px; }
+  .demo-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+  .demo-head h1 { margin: 0; font-size: 2.4em; }
+  .demo-head p { margin: 4px 0 0; }
+  .demo-theme { display: grid; gap: 3px; min-width: 240px; }
+  .demo section { margin: 0 0 36px; }
+  .demo section > h2 { border-bottom: 1px solid var(--sc-frame-lo); padding-bottom: 4px; margin-bottom: 14px; }
+  .demo-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; align-items: start; }
+  .demo code { color: var(--sc-c-green); font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .demo-game { position: relative; overflow: hidden; border: 1px solid #222; background:
+      radial-gradient(ellipse at 30% 40%, #3a3020 0, transparent 60%),
+      radial-gradient(ellipse at 75% 30%, #24301c 0, transparent 55%),
+      repeating-conic-gradient(#2a2418 0 25%, #262016 0 50%) 0 0 / 8px 8px; }
+  .demo-game-view { position: relative; height: 230px; }
+  .demo-game .sc-resources { position: absolute; top: 4px; right: 8px; }
+  .demo-game .sc-timer { position: absolute; top: 6px; left: 8px; }
+  .demo-game .sc-messages { position: absolute; left: 10px; bottom: 30px; }
+  .demo-game .sc-notice { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); }
+  .demo-game .demo-ring { position: absolute; }
+  .demo-minimap { background:
+      radial-gradient(circle at 20% 80%, #3c5c2c 0 14%, transparent 15%),
+      radial-gradient(circle at 80% 20%, #3c5c2c 0 14%, transparent 15%),
+      linear-gradient(135deg, #1c2414, #2c2c1c 50%, #1c2414); }
+  .demo-wire { width: 54px; height: 60px; color: inherit; }
+</style>
+</head>
+<body>
+<div id="root" class="sc sc-terran sc-screen">
+<div class="demo">
+
+  <header class="demo-head">
+    <div>
+      <h1>StarCraft UI</h1>
+      <p>A lightweight HTML + CSS component library styled after the StarCraft and StarCraft II interfaces.</p>
+    </div>
+    <div class="demo-theme">
+      <label class="sc-label" for="theme">Theme</label>
+      <select class="sc-select" id="theme">
+        <optgroup label="StarCraft (1998)">
+          <option value="terran">Terran</option>
+          <option value="zerg">Zerg</option>
+          <option value="protoss">Protoss</option>
+        </optgroup>
+        <optgroup label="StarCraft (modern)">
+          <option value="hd-terran">Terran — Modern</option>
+          <option value="hd-zerg">Zerg — Modern</option>
+          <option value="hd-protoss">Protoss — Modern</option>
+        </optgroup>
+        <optgroup label="StarCraft II">
+          <option value="sc2-terran">Terran — StarCraft II</option>
+          <option value="sc2-zerg">Zerg — StarCraft II</option>
+          <option value="sc2-protoss">Protoss — StarCraft II</option>
+        </optgroup>
+      </select>
+    </div>
+  </header>
+
+  <!-- ===================== HUD ===================== -->
+  <section id="hud">
+    <h2>Console HUD</h2>
+    <div class="demo-game">
+      <div class="demo-game-view sc-cursor">
+        <span class="sc-timer">12:47</span>
+        <div class="sc-resources">
+          <span class="sc-res sc-res-mineral">1250</span>
+          <span class="sc-res sc-res-gas">384</span>
+          <span class="sc-res sc-res-supply">42/60</span>
+        </div>
+        <span class="sc-select-ring demo-ring" style="--w:40px; left:38%; top:42%"></span>
+        <span class="sc-select-ring demo-ring" style="--w:28px; left:46%; top:56%"></span>
+        <span class="sc-select-ring demo-ring is-enemy" style="--w:34px; left:66%; top:30%"></span>
+        <ul class="sc-messages">
+          <li class="sc-msg is-system">Your base is under attack.</li>
+          <li class="sc-msg"><span class="sc-msg-from sc-p2">Raynor</span>gg, hold the ramp</li>
+          <li class="sc-msg is-ally"><span class="sc-msg-from sc-p3">Fenix</span>sending reinforcements</li>
+        </ul>
+        <span class="sc-notice">Not enough minerals...</span>
+      </div>
+
+      <div class="sc-console">
+        <div class="sc-minimap demo-minimap">
+          <span class="sc-minimap-dot sc-p1 is-building" style="--x:18%; --y:76%"></span>
+          <span class="sc-minimap-dot sc-p1" style="--x:28%; --y:70%"></span>
+          <span class="sc-minimap-dot sc-p2 is-building" style="--x:78%; --y:20%"></span>
+          <span class="sc-minimap-dot sc-p2" style="--x:62%; --y:34%"></span>
+          <span class="sc-minimap-ping" style="--x:30%; --y:68%"></span>
+          <span class="sc-minimap-view" style="--x:22%; --y:58%"></span>
+        </div>
+
+        <div class="sc-info">
+          <div class="sc-unit">
+            <div>
+              <div class="sc-unit-wire">
+                <svg class="demo-wire" viewBox="0 0 18 20" shape-rendering="crispEdges" fill="none" stroke="currentColor"><path d="M9 1.5l4 3v4l3 2v6h-4v2H6v-2H2v-6l3-2v-4z"/><path d="M7 6h4v3H7z"/></svg>
+              </div>
+              <div class="sc-unit-vitals">
+                <span class="sc-stat">40/40</span>
+              </div>
+            </div>
+            <div>
+              <div class="sc-unit-name">Terran Marine</div>
+              <div class="sc-unit-rank">Private</div>
+              <div class="sc-unit-kills">Kills: 3</div>
+              <div class="sc-upgrades">
+                <span class="sc-upgrade" data-level="1"></span>
+                <span class="sc-upgrade" data-level="2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-portrait is-static" id="portrait"></div>
+
+        <div class="sc-cmd">
+          <button class="sc-cmd-btn" data-sc-tip="Move (M)"><span class="sc-glyph sc-glyph-move"></span></button>
+          <button class="sc-cmd-btn" data-sc-tip="Stop (S)"><span class="sc-glyph sc-glyph-stop"></span></button>
+          <button class="sc-cmd-btn is-selected" data-sc-tip="Attack (A)"><span class="sc-glyph sc-glyph-attack"></span></button>
+          <button class="sc-cmd-btn" data-sc-tip="Patrol (P)"><span class="sc-glyph sc-glyph-patrol"></span></button>
+          <button class="sc-cmd-btn" data-sc-tip="Hold Position (H)"><span class="sc-glyph sc-glyph-hold"></span></button>
+          <span class="sc-cmd-empty"></span>
+          <button class="sc-cmd-btn" disabled><span class="sc-glyph sc-glyph-upgrade"></span></button>
+          <span class="sc-cmd-empty"></span>
+          <button class="sc-cmd-btn" data-sc-tip="Cancel (Esc)"><span class="sc-glyph sc-glyph-cancel"></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Dialogs ===================== -->
+  <section id="dialogs">
+    <h2>Dialogs</h2>
+    <div class="demo-row">
+      <div class="sc-dialog" style="width:250px">
+        <div class="sc-dialog-title">Game Menu</div>
+        <div class="sc-menu">
+          <button class="sc-btn"><span class="sc-hk">S</span>ave Game</button>
+          <button class="sc-btn"><span class="sc-hk">L</span>oad Game</button>
+          <button class="sc-btn"><span class="sc-hk">P</span>ause Game</button>
+          <button class="sc-btn"><span class="sc-hk">O</span>ptions</button>
+          <button class="sc-btn">H<span class="sc-hk">e</span>lp</button>
+          <button class="sc-btn" disabled>Mission <span class="sc-hk">O</span>bjectives</button>
+          <button class="sc-btn"><span class="sc-hk">E</span>nd Mission</button>
+          <div class="sc-menu-sep"></div>
+          <button class="sc-btn"><span class="sc-hk">R</span>eturn to Game</button>
+        </div>
+      </div>
+
+      <div class="sc-dialog" style="width:330px">
+        <div class="sc-dialog-title">Options</div>
+        <div class="sc-dialog-body">
+          <div class="sc-field">
+            <label class="sc-label" for="speed">Game Speed</label>
+            <input class="sc-range" id="speed" type="range" min="0" max="6" value="5">
+            <div class="sc-scale"><span>Slowest</span><span>Fastest</span></div>
+          </div>
+          <div class="sc-field">
+            <label class="sc-label" for="music">Music</label>
+            <input class="sc-range" id="music" type="range" value="70">
+          </div>
+          <div class="sc-field">
+            <label class="sc-label" for="sfx">Sound Effects</label>
+            <input class="sc-range" id="sfx" type="range" value="90">
+          </div>
+          <div style="display:grid; gap:6px; margin-top:12px">
+            <label class="sc-check"><input type="checkbox" checked><span>Unit Speech</span></label>
+            <label class="sc-check"><input type="checkbox" checked><span>Unit Acknowledgements</span></label>
+            <label class="sc-check"><input type="checkbox"><span>Building Sounds</span></label>
+            <label class="sc-check"><input type="checkbox" disabled><span>Subtitles</span></label>
+          </div>
+        </div>
+        <div class="sc-dialog-actions">
+          <button class="sc-btn">Ok</button>
+          <button class="sc-btn">Cancel</button>
+        </div>
+      </div>
+
+      <div class="sc-dialog" style="width:300px">
+        <div class="sc-dialog-title">Mission Objectives</div>
+        <ul class="sc-objectives">
+          <li class="is-done">Build a Command Center</li>
+          <li>Destroy the Zerg Hive Cluster</li>
+          <li>Jim Raynor must survive</li>
+        </ul>
+        <div class="sc-dialog-actions"><button class="sc-btn">Ok</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Glue / Menus ===================== -->
+  <section id="glue">
+    <h2>Glue Screens</h2>
+    <div class="demo-grid">
+      <div class="sc-panel">
+        <button class="sc-glue">Single Player<small>Play against the computer</small></button>
+        <button class="sc-glue is-hover">Multiplayer<small>Play with other people</small></button>
+        <button class="sc-glue">Campaign Editor<small>Create your own maps</small></button>
+        <button class="sc-glue">Exit</button>
+      </div>
+
+      <div class="sc-panel">
+        <h3>Select Connection</h3>
+        <ul class="sc-list" role="listbox">
+          <li>Battle.net</li>
+          <li class="is-selected" aria-selected="true">Local Area Network (UDP)</li>
+          <li>Direct Cable Connection</li>
+          <li>Modem</li>
+          <li class="is-disabled">Ultimate Battle.net</li>
+        </ul>
+        <p style="margin-top:10px">Requirements: A network that supports UDP. Up to 8 players.</p>
+        <div class="sc-dialog-actions is-split">
+          <button class="sc-btn">Cancel</button>
+          <button class="sc-btn">Ok</button>
+        </div>
+      </div>
+
+      <div class="sc-panel">
+        <h3>Create Game</h3>
+        <div class="sc-field">
+          <label class="sc-label" for="gname">Game Name</label>
+          <input class="sc-input" id="gname" value="op bgh 3v3">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="gpass">Password</label>
+          <input class="sc-input" id="gpass" placeholder="(optional)">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="gtype">Game Type</label>
+          <select class="sc-select" id="gtype">
+            <option>Melee</option><option>Free For All</option><option>Top vs Bottom</option><option>Use Map Settings</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:14px">
+          <label class="sc-check"><input type="radio" name="spd" checked><span>Fastest</span></label>
+          <label class="sc-check"><input type="radio" name="spd"><span>Normal</span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Buttons ===================== -->
+  <section id="buttons">
+    <h2>Buttons</h2>
+    <div class="demo-row" style="align-items:center">
+      <button class="sc-btn">Ok</button>
+      <button class="sc-btn is-hover">Hover</button>
+      <button class="sc-btn is-active">Pressed</button>
+      <button class="sc-btn" disabled>Disabled</button>
+      <button class="sc-btn sc-btn-sm">Small</button>
+      <button class="sc-btn sc-btn-lg">Large</button>
+    </div>
+    <div class="demo-row" style="margin-top:16px">
+      <div class="sc-cmd" style="display:flex; flex-wrap:wrap">
+        <button class="sc-cmd-btn"><span class="sc-glyph sc-glyph-move"></span></button>
+        <button class="sc-cmd-btn is-hover"><span class="sc-glyph sc-glyph-stop"></span></button>
+        <button class="sc-cmd-btn is-active"><span class="sc-glyph sc-glyph-attack"></span></button>
+        <button class="sc-cmd-btn is-selected"><span class="sc-glyph sc-glyph-patrol"></span></button>
+        <button class="sc-cmd-btn"><span class="sc-glyph sc-glyph-gather"></span></button>
+        <button class="sc-cmd-btn"><span class="sc-glyph sc-glyph-return"></span></button>
+        <button class="sc-cmd-btn"><span class="sc-glyph sc-glyph-build"></span></button>
+        <button class="sc-cmd-btn"><span class="sc-glyph sc-glyph-rally"></span></button>
+        <button class="sc-cmd-btn" disabled><span class="sc-glyph sc-glyph-hold"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Info ===================== -->
+  <section id="info">
+    <h2>Info Panel, Vitals &amp; Tooltips</h2>
+    <div class="demo-grid">
+      <div class="sc-info">
+        <div class="sc-progress-label">Building</div>
+        <div class="sc-progress" style="--value:62"></div>
+        <div style="margin-top:12px" class="sc-selection">
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel is-mid"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel is-low"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel is-mid"><span class="sc-sel-pip"></span></span>
+          <span class="sc-sel"><span class="sc-sel-pip"></span></span>
+        </div>
+      </div>
+
+      <div class="sc-panel" style="display:grid; gap:8px">
+        <span class="sc-bar sc-bar-shield" style="--value:100"></span>
+        <span class="sc-bar" style="--value:85"></span>
+        <span class="sc-bar is-mid" style="--value:55"></span>
+        <span class="sc-bar is-low" style="--value:20"></span>
+        <span class="sc-bar sc-bar-energy sc-bar-lg" style="--value:40"></span>
+        <div style="display:flex; gap:14px">
+          <span class="sc-stat">80/80</span><span class="sc-stat is-mid">35/80</span><span class="sc-stat is-low">9/80</span><span class="sc-stat-plain">50/200</span>
+        </div>
+      </div>
+
+      <div class="sc-panel" style="display:grid; gap:12px; justify-items:start">
+        <div class="sc-tooltip">
+          Train <span class="sc-hk">S</span>CV
+          <div class="sc-tooltip-cost"><span><i class="sc-ico sc-ico-mineral"></i> 50</span><span><i class="sc-ico sc-ico-supply"></i> 1</span></div>
+        </div>
+        <div class="sc-tooltip">
+          Research <span class="sc-hk">U</span>-238 Shells
+          <div class="sc-tooltip-cost"><span><i class="sc-ico sc-ico-mineral"></i> 150</span><span><i class="sc-ico sc-ico-gas"></i> 150</span></div>
+        </div>
+        <div class="sc-transmission"><span class="sc-speaker">Adjutant:</span> Nuclear launch detected.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Score ===================== -->
+  <section id="score">
+    <h2>Score Screen</h2>
+    <div class="sc-panel">
+      <div class="sc-tabs" role="tablist">
+        <button class="sc-tab" role="tab">Units</button>
+        <button class="sc-tab" role="tab">Structures</button>
+        <button class="sc-tab is-active" role="tab" aria-selected="true">Resources</button>
+      </div>
+      <table class="sc-table" style="margin-top:8px">
+        <thead><tr><th>Player</th><th>Gas Mined</th><th>Minerals Mined</th><th>Total Spent</th></tr></thead>
+        <tbody>
+          <tr class="sc-p1"><td>Kerrigan</td><td>4,820</td><td>12,480</td><td>16,950</td></tr>
+          <tr class="sc-p2"><td>Raynor</td><td>3,416</td><td>10,224</td><td>13,100</td></tr>
+          <tr class="sc-p3"><td>Tassadar</td><td>2,904</td><td>9,880</td><td>12,345</td></tr>
+        </tbody>
+      </table>
+      <div style="display:grid; gap:6px; margin-top:12px">
+        <div class="sc-scorebar sc-p1" style="--value:92"></div>
+        <div class="sc-scorebar sc-p2" style="--value:74"></div>
+        <div class="sc-scorebar sc-p3" style="--value:66"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Chat ===================== -->
+  <section id="chat">
+    <h2>Chat &amp; Text</h2>
+    <div class="demo-grid">
+      <div class="sc-panel">
+        <ul class="sc-list" style="max-height:120px">
+          <li class="is-header">Channel: Brood War USA-1</li>
+          <li><span class="sc-player-text sc-p8">&lt;Flash&gt;</span> anyone up for a 1v1?</li>
+          <li><span class="sc-player-text sc-p3">&lt;Bisu&gt;</span> lost temple?</li>
+          <li><span class="sc-player-text sc-p1">&lt;Jaedong&gt;</span> fighting spirit only</li>
+          <li class="is-disabled">Stork has left the channel.</li>
+          <li><span class="sc-player-text sc-p5">&lt;Boxer&gt;</span> gl hf</li>
+        </ul>
+        <div class="sc-chatline" style="margin-top:8px">To All: <input class="sc-input" value="gg"></div>
+      </div>
+      <div class="sc-panel">
+        <p><span class="sc-pale">Pale (default)</span> · <span class="sc-yellow">Yellow</span> · <span class="sc-white">White</span> · <span class="sc-grey">Grey</span> · <span class="sc-red">Red</span> · <span class="sc-green">Green</span></p>
+        <p>
+          <span class="sc-player-swatch sc-p1"></span> <span class="sc-player-swatch sc-p2"></span>
+          <span class="sc-player-swatch sc-p3"></span> <span class="sc-player-swatch sc-p4"></span>
+          <span class="sc-player-swatch sc-p5"></span> <span class="sc-player-swatch sc-p6"></span>
+          <span class="sc-player-swatch sc-p7"></span> <span class="sc-player-swatch sc-p8"></span>
+        </p>
+        <div class="sc-well">
+          <span class="sc-ico sc-ico-mineral"></span> <span class="sc-green">Minerals</span> ·
+          <span class="sc-ico sc-ico-gas"></span> <span class="sc-green">Vespene Gas</span> ·
+          <span class="sc-ico sc-ico-supply"></span> <span class="sc-green">Supply</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</div>
+<script>
+  // Theme id -> classes on the .sc root: classic "sc-terran", modern "sc-hd sc-terran", SC2 "sc2 sc2-terran"
+  const root = document.getElementById('root');
+  const select = document.getElementById('theme');
+  const THEME_CLASSES = ['sc-terran', 'sc-zerg', 'sc-protoss', 'sc-hd', 'sc2', 'sc2-terran', 'sc2-zerg', 'sc2-protoss'];
+  const UNITS = { terran: 'Marine', zerg: 'Hydralisk', protoss: 'Zealot' };
+  const setTheme = id => {
+    if (![...select.options].some(o => o.value === id)) id = 'terran';
+    const [era, race] = id.includes('-') ? id.split('-') : ['classic', id];
+    root.classList.remove(...THEME_CLASSES);
+    if (era === 'sc2') root.classList.add('sc2', 'sc2-' + race);
+    else root.classList.add('sc-' + race, ...(era === 'hd' ? ['sc-hd'] : []));
+    select.value = id;
+    const prefix = era === 'sc2' ? '' : race[0].toUpperCase() + race.slice(1) + ' ';
+    document.querySelector('.sc-unit-name').textContent = prefix + UNITS[race];
+    const p = document.getElementById('portrait');
+    p.classList.add('is-static'); setTimeout(() => p.classList.remove('is-static'), 500);
+  };
+  select.addEventListener('change', () => {
+    setTheme(select.value);
+    history.replaceState(null, '', '?theme=' + select.value);
+  });
+  const q = new URLSearchParams(location.search);
+  setTheme(q.get('theme') || q.get('race') || 'terran');
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+/* ==========================================================================
+   STARCRAFT UI — terran skin  (scope: .sc-terran)
+   Cold gunmetal plating, bevels, corner bolt plates, stepped console top.
+   ========================================================================== */
+.sc-terran {
+  --sc-panel-bg: rgba(6, 10, 14, .86);
+  --sc-panel-bg-solid: #080c10;
+
+  --sc-frame-hi: #bcc4cc;
+  --sc-frame: #6e767e;
+  --sc-frame-mid: #4a5056;
+  --sc-frame-lo: #2a2e33;
+  --sc-frame-dark: #07080a;
+
+  --sc-accent: #3cb48c;
+  --sc-accent-hi: #a4f4cc;
+  --sc-glow: rgba(48, 220, 150, .5);
+  --sc-glue: #40cc90;
+  --sc-glue-hover: #c4fce0;
+
+  --sc-text-dim: #7884a0;
+  --sc-select-bg: #1c4250;
+
+  --sc-btn-bg: linear-gradient(#4a5159, #30353b 45%, #22262b 55%, #181b1f);
+  --sc-btn-bg-hover: linear-gradient(#5c646d, #3c4249 45%, #2c3136 55%, #1f2226);
+  --sc-btn-bg-active: linear-gradient(#121417, #1c1f23 50%, #2a2e33);
+
+  --sc-icon: #d0bc6c;
+  --sc-icon-hover: #fcf4a4;
+
+  --sc-scroll-track: #07090b;
+  --sc-scroll-thumb: #646c74;
+
+  --sc-console-bg: linear-gradient(#636c75, #4a525a 22%, #3a4148 60%, #262a2f);
+  /* brushed plate + two seam lines + a dark lower skirt */
+  --sc-console-texture:
+    linear-gradient(transparent calc(100% - 7px), #07080a calc(100% - 7px) calc(100% - 6px), #6e767e calc(100% - 6px) calc(100% - 5px), transparent 0),
+    repeating-linear-gradient(90deg, transparent 0 199px, rgba(0,0,0,.35) 199px 200px, rgba(255,255,255,.08) 200px 201px, transparent 201px 400px),
+    repeating-linear-gradient(rgba(255,255,255,.035) 0 1px, transparent 1px 3px);
+
+  /* 9x9 bolt plate, reused for every corner ornament */
+  --_tr-bolt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath fill='%2307080a' d='M0 0h9v9H0z'/%3E%3Cpath fill='%23828a92' d='M1 1h7v7H1z'/%3E%3Cpath fill='%23d4dce4' d='M1 1h7v1H2v6H1z'/%3E%3Cpath fill='%23353a40' d='M2 7h6V2h-1v5H2z'/%3E%3Cpath fill='%23262b30' d='M3 3h3v3H3z'/%3E%3Cpath fill='%23eef2f6' d='M3 3h2v1H4v1H3z'/%3E%3Cpath fill='%23a0a8b0' d='M4 4h1v1H4z'/%3E%3C/svg%3E");
+  --_tr-hazard: repeating-linear-gradient(-45deg, #9c8020 0 3px, #141517 3px 6px);
+
+  --sc-console-rim: 12px;
+  --sc-title-rule: var(--_tr-hazard) left bottom 1px / 100% 2px no-repeat,
+    linear-gradient(#07080a, #07080a) left bottom / 100% 4px no-repeat;
+  --sc-cmd-bg: linear-gradient(#5e666e, #464d54 50%, #353b41);
+  --sc-cmd-bg-hover: linear-gradient(#6c757e, #50575e 50%, #3c4248);
+  --sc-tooltip-bg: rgba(4, 8, 12, .88);
+  --sc-tooltip-border: var(--sc-frame);
+
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%23b4bcc4' d='M5 0h4v2H5z'/%3E%3Cpath fill='%23081c08' d='M2 2h10v12H2z'/%3E%3Cpath fill='%239ca4ac' d='M3 2h8v2H3z'/%3E%3Cpath fill='%23189c28' d='M3 4h8v8H3z'/%3E%3Cpath fill='%2360ec74' d='M4 4h2v8H4z'/%3E%3Cpath fill='%230c5814' d='M9 4h2v8H9zM3 7h8v1H3z'/%3E%3Cpath fill='%236c747c' d='M3 12h8v1H3z'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%2314181c' d='M1 3h12v10H1z'/%3E%3Cpath fill='%23788290' d='M2 4h10v8H2z'/%3E%3Cpath fill='%23c4ccd4' d='M2 4h10v1H2z'/%3E%3Cpath fill='%233c4248' d='M2 11h10v1H2z'/%3E%3Cpath fill='%2314181c' d='M3 0h8v4H3z'/%3E%3Cpath fill='%239aa2aa' d='M4 1h6v2H4z'/%3E%3Cpath fill='%23dce4ec' d='M4 1h6v1H4z'/%3E%3Cpath fill='%232c3238' d='M4 6h6v4H4z'/%3E%3Cpath fill='%2338f048' d='M5 7h1v2H5zM8 7h1v2H8z'/%3E%3C/svg%3E");
+}
+
+/* --- Frames: bolt plates on all four corners (sit on the 7px frame ring) --- */
+.sc-terran .sc-panel::before,
+.sc-terran .sc-dialog::before,
+.sc-terran .sc-frame::before {
+  content: "";
+  inset: -2px;
+  background:
+    var(--_tr-bolt) left top / 9px 9px no-repeat,
+    var(--_tr-bolt) right top / 9px 9px no-repeat,
+    var(--_tr-bolt) left bottom / 9px 9px no-repeat,
+    var(--_tr-bolt) right bottom / 9px 9px no-repeat;
+}
+
+/* Dialogs: steel clamps across the middle of the top and bottom edges */
+.sc-terran .sc-dialog::after {
+  content: "";
+  inset: -3px 0;
+  --_c: linear-gradient(90deg, #07080a 0 1px, #bcc4cc 1px 2px, #6e767e 2px calc(100% - 2px), #2a2e33 0 calc(100% - 1px), #07080a 0);
+  background:
+    linear-gradient(#07080a 0 1px, transparent 1px calc(100% - 1px), #07080a 0) center top / 36px 6px no-repeat,
+    var(--_c) center top / 36px 6px no-repeat,
+    linear-gradient(#07080a 0 1px, transparent 1px calc(100% - 1px), #07080a 0) center bottom / 36px 6px no-repeat,
+    var(--_c) center bottom / 36px 6px no-repeat;
+}
+
+/* Dialog title: thin hazard rule under the yellow caption */
+.sc-terran .sc-dialog-title { padding-bottom: 8px; }
+
+
+
+/* --- Console: stepped silhouette (high behind minimap + command card) --- */
+.sc-terran .sc-console {
+  --_l: min(166px, 42%);
+  --_r: min(158px, 38%);
+}
+.sc-terran .sc-console::before {
+  content: "";
+  inset: 0 0 auto;
+  height: 24px;
+  clip-path: polygon(0 0, var(--_l) 0, calc(var(--_l) + 12px) 12px,
+    calc(100% - var(--_r) - 12px) 12px, calc(100% - var(--_r)) 0, 100% 0, 100% 100%, 0 100%);
+  background:
+    /* top edge of raised blocks */
+    linear-gradient(#07080a 0 1px, #bcc4cc 1px 2px, transparent 2px) left top / 100% 2px no-repeat,
+    /* slope edges (approximated as dark wedges) */
+    linear-gradient(45deg, transparent calc(50% - 1px), #07080a 0 calc(50% + 1px), transparent 0) var(--_l) 0 / 12px 12px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1px), #07080a 0 calc(50% + 1px), transparent 0) calc(100% - var(--_r) - 12px) 0 / 12px 12px no-repeat,
+    /* raised plates: bottom seam at 22px */
+    linear-gradient(#6c757e, #535b63 60%, #464d54 21px, #07080a 21px 22px, #8a929a 22px 23px, transparent 23px) left top / calc(var(--_l) + 12px) 100% no-repeat,
+    linear-gradient(#6c757e, #535b63 60%, #464d54 21px, #07080a 21px 22px, #8a929a 22px 23px, transparent 23px) right top / calc(var(--_r) + 12px) 100% no-repeat,
+    /* low middle edge at 12px */
+    linear-gradient(transparent 12px, #07080a 12px 13px, #a4acb4 13px 14px, transparent 14px);
+}
+.sc-terran .sc-console::after {
+  content: "";
+  inset: 0;
+  background:
+    var(--_tr-bolt) 5px 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) calc(var(--_l) - 14px) 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) calc(100% - var(--_r) + 5px) 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) right 5px top 7px / 9px 9px no-repeat,
+    var(--_tr-hazard) left bottom / 100% 2px no-repeat,
+    linear-gradient(#07080a, #07080a) left bottom / 100% 3px no-repeat;
+}

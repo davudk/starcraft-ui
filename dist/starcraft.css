@@ -1,0 +1,2744 @@
+/* ==========================================================================
+   STARCRAFT UI — core
+   Race-agnostic tokens, base, and component structure.
+   Race skins (src/races/*.css) only re-map tokens and add race ornaments.
+
+   Usage:  <div class="sc sc-terran"> ... </div>
+           (sc-terran | sc-zerg | sc-protoss — terran is the default)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+.sc {
+  /* --- SC1 text palette (tfontgam colours, \x01-\x07 chat codes) --- */
+  --sc-c-pale: #b8b8e8;     /* default text  (\x02 cyan / pale blue) */
+  --sc-c-yellow: #dcdc3c;   /* \x03 */
+  --sc-c-white: #ffffff;    /* \x04 */
+  --sc-c-grey: #848484;     /* \x05 */
+  --sc-c-red: #c81818;      /* \x06 */
+  --sc-c-green: #10fc18;    /* \x07 — resource counts, hp full */
+  --sc-c-orange: #f88c14;
+  --sc-c-blue: #0c48cc;
+
+  /* --- SC1 player colours --- */
+  --sc-p1: #f40404;  /* red    */
+  --sc-p2: #0c48cc;  /* blue   */
+  --sc-p3: #2cb494;  /* teal   */
+  --sc-p4: #88409c;  /* purple */
+  --sc-p5: #f88c14;  /* orange */
+  --sc-p6: #703014;  /* brown  */
+  --sc-p7: #cce0d0;  /* white  */
+  --sc-p8: #fcfc38;  /* yellow */
+
+  /* --- vitals --- */
+  --sc-hp-high: #10fc18;
+  --sc-hp-mid: #fcfc38;
+  --sc-hp-low: #f40404;
+  --sc-shield: #3c7cfc;
+  --sc-energy: #b43cc8;
+
+  /* --- typography --- */
+  --sc-font: "Pixelify Sans", "Tahoma", "Verdana", "Geneva", sans-serif;
+  --sc-font-title: var(--sc-font);
+  --sc-font-size: 13px;
+  --sc-line: 1.25;
+
+  /* --- race-mapped tokens (Terran defaults; overridden per race) --- */
+  --sc-bg: #000000;
+  --sc-panel-bg: rgba(12, 16, 20, 0.88);
+  --sc-panel-bg-solid: #0c1014;
+
+  --sc-frame-hi: #c8ccd4;     /* bevel highlight     */
+  --sc-frame: #7c8088;        /* frame body          */
+  --sc-frame-mid: #565a62;    /* frame body (shade)  */
+  --sc-frame-lo: #33363c;     /* bevel shadow        */
+  --sc-frame-dark: #0c0c10;   /* outline             */
+
+  --sc-accent: #4c9cdc;       /* race key colour     */
+  --sc-accent-hi: #9cdcfc;
+  --sc-glow: rgba(76, 156, 220, 0.55);
+
+  --sc-text: var(--sc-c-pale);
+  --sc-text-dim: #7878a0;
+  --sc-title: var(--sc-c-yellow);
+  --sc-label: var(--sc-c-yellow);         /* button captions */
+  --sc-label-hover: var(--sc-c-white);
+  --sc-label-disabled: var(--sc-c-grey);
+
+  --sc-btn-bg: linear-gradient(#3c4048, #22252a 55%, #181a1e);
+  --sc-btn-bg-hover: linear-gradient(#4c525c, #2c3036 55%, #1e2024);
+  --sc-btn-bg-active: linear-gradient(#141518, #1e2024 50%, #2a2d32);
+
+  --sc-field-bg: #000000;
+  --sc-field-text: var(--sc-c-green);
+  --sc-select-bg: #24345c;
+  --sc-select-text: var(--sc-c-white);
+
+  --sc-icon: #d8c45c;          /* command-card glyph colour */
+  --sc-icon-hover: #fcfca0;
+  --sc-icon-disabled: #4c4c4c;
+
+  --sc-progress: #10a818;
+  --sc-progress-hi: #58fc5c;
+
+  --sc-tooltip-bg: rgba(0, 0, 0, .82);
+
+  --sc-scroll-track: #08090a;
+  --sc-scroll-thumb: #6c7078;
+
+  --sc-console-bg: linear-gradient(#5c6068, #3c4046 40%, #26282c);
+  --sc-console-texture: none;   /* extra image layer(s) over --sc-console-bg; drawn full-size, so
+                                   use full-size gradients or an SVG <pattern> for tiles */
+
+  /* Optional skin hooks (left undeclared so nested race scopes resolve correctly):
+     --sc-console-rim       transparent band at the console top for a shaped edge (default 0px);
+                            raise .sc-console padding-top to match if it exceeds ~20px
+     --sc-console-edge      the 2px line drawn at the rim (set to none if ::before draws its own)
+     --sc-title-rule        background drawn under .sc-dialog-title
+     --sc-cmd-bg / -hover / -active   command-card button fills (default: --sc-btn-bg*)
+     --sc-screen-shadow     bevel ring around minimap / info panel / portrait
+     --sc-tooltip-border    tooltip border colour */
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%231c3c9c' d='M1 13l3-9v9z'/%3E%3Cpath fill='%2370acfc' d='M4 4l3 9H4z'/%3E%3Cpath fill='%231c3c9c' d='M9 13l2-7v7z'/%3E%3Cpath fill='%2370acfc' d='M11 6l2 7h-2z'/%3E%3Cpath fill='%23204cc0' d='M5 13l3-12v12z'/%3E%3Cpath fill='%23b0dcfc' d='M8 1l3 12H8z'/%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Crect x='4' y='1' width='6' height='2' fill='%23a0a4a8'/%3E%3Crect x='3' y='3' width='8' height='10' fill='%23187818'/%3E%3Crect x='4' y='3' width='3' height='10' fill='%2340d040'/%3E%3Crect x='3' y='6' width='8' height='1' fill='%230c400c'/%3E%3Crect x='3' y='10' width='8' height='1' fill='%230c400c'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='8' height='3' fill='%239098a0'/%3E%3Crect x='1' y='5' width='12' height='7' fill='%23687078'/%3E%3Crect x='1' y='5' width='12' height='1' fill='%23b8c0c8'/%3E%3Crect x='5' y='7' width='4' height='3' fill='%2330d030'/%3E%3Crect x='1' y='12' width='12' height='1' fill='%23282c30'/%3E%3C/svg%3E");
+
+  /* --- layout constants (SC1 640x480 metrics) --- */
+  --sc-cmd-size: 36px;
+  --sc-bevel: 1px;
+
+  font-family: var(--sc-font);
+  font-size: var(--sc-font-size);
+  line-height: var(--sc-line);
+  color: var(--sc-text);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  image-rendering: pixelated;
+  text-rendering: optimizeSpeed;
+}
+
+.sc *,
+.sc *::before,
+.sc *::after { box-sizing: border-box; }
+
+.sc img,
+.sc canvas,
+.sc svg { image-rendering: pixelated; }
+
+/* Page-level surface (optional) */
+.sc-screen {
+  background: var(--sc-bg);
+  min-height: 100%;
+}
+
+/* Integer pixel scaling — SC1 was 640x480; zoom keeps edges crisp */
+.sc-x2 { zoom: 2; }
+.sc-x3 { zoom: 3; }
+
+/* --------------------------------------------------------------------------
+   2. Typography & colour utilities
+   -------------------------------------------------------------------------- */
+.sc h1, .sc h2, .sc h3, .sc h4,
+.sc .sc-h1, .sc .sc-h2, .sc .sc-h3 {
+  margin: 0 0 .5em;
+  font-family: var(--sc-font-title);
+  font-weight: normal;
+  color: var(--sc-title);
+  letter-spacing: .02em;
+}
+.sc h1, .sc .sc-h1 { font-size: 2em; }
+.sc h2, .sc .sc-h2 { font-size: 1.5em; }
+.sc h3, .sc .sc-h3 { font-size: 1.15em; }
+.sc p { margin: 0 0 .75em; }
+.sc a { color: var(--sc-c-yellow); text-decoration: none; }
+.sc a:hover { color: var(--sc-c-white); }
+
+.sc-pale   { color: var(--sc-c-pale) !important; }
+.sc-yellow { color: var(--sc-c-yellow) !important; }
+.sc-white  { color: var(--sc-c-white) !important; }
+.sc-grey   { color: var(--sc-c-grey) !important; }
+.sc-red    { color: var(--sc-c-red) !important; }
+.sc-green  { color: var(--sc-c-green) !important; }
+.sc-orange { color: var(--sc-c-orange) !important; }
+.sc-accent { color: var(--sc-accent) !important; }
+
+.sc-p1 { --sc-player: var(--sc-p1); }
+.sc-p2 { --sc-player: var(--sc-p2); }
+.sc-p3 { --sc-player: var(--sc-p3); }
+.sc-p4 { --sc-player: var(--sc-p4); }
+.sc-p5 { --sc-player: var(--sc-p5); }
+.sc-p6 { --sc-player: var(--sc-p6); }
+.sc-p7 { --sc-player: var(--sc-p7); }
+.sc-p8 { --sc-player: var(--sc-p8); }
+[class*="sc-p"].sc-player-text,
+.sc-player-text { color: var(--sc-player, var(--sc-c-white)); }
+.sc-player-swatch {
+  display: inline-block;
+  width: 10px; height: 10px;
+  background: var(--sc-player, var(--sc-p1));
+  box-shadow: 0 0 0 1px #000;
+  vertical-align: -1px;
+}
+
+/* Hotkey letter — "Train <u>S</u>CV" */
+.sc-hk,
+.sc kbd {
+  font: inherit;
+  color: var(--sc-c-yellow);
+  background: none;
+  padding: 0;
+  border: 0;
+  text-decoration: none;
+}
+.sc-hk-u { text-decoration: underline; text-underline-offset: 2px; }
+
+.sc-mono { font-variant-numeric: tabular-nums; }
+.sc-shadow { text-shadow: 1px 1px 0 #000; }
+.sc-center { text-align: center; }
+.sc-upper { text-transform: uppercase; letter-spacing: .06em; }
+
+/* Horizontal rule */
+.sc hr,
+.sc-hr {
+  border: 0;
+  height: 2px;
+  margin: .75em 0;
+  background: linear-gradient(var(--sc-frame-lo) 50%, var(--sc-frame-hi) 50%);
+  opacity: .8;
+}
+
+/* --------------------------------------------------------------------------
+   3. Frames & panels
+   A "frame" is the race-coloured bevelled border used on every SC1 dialog.
+   -------------------------------------------------------------------------- */
+.sc-frame,
+.sc-panel,
+.sc-dialog {
+  position: relative;
+  border: 2px solid var(--sc-frame-dark);
+  background-color: var(--sc-panel-bg);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi),
+    inset -1px -1px 0 var(--sc-frame-lo),
+    inset 0 0 0 3px var(--sc-frame),
+    inset 0 0 0 4px var(--sc-frame-mid),
+    inset 0 0 0 5px var(--sc-frame-dark),
+    0 0 0 1px rgba(0, 0, 0, .6);
+}
+
+.sc-panel { padding: 14px 16px; }
+
+/* Solid (non-translucent) variant */
+.sc-solid { background-color: var(--sc-panel-bg-solid); }
+
+/* Inset well — black recessed area (list boxes, info screens) */
+.sc-well {
+  position: relative;
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-frame-mid),
+    1px 1px 0 1px var(--sc-frame-hi);
+  padding: 6px 8px;
+}
+
+/* Ornament slot: race skins draw corner pieces into these */
+.sc-panel::before,
+.sc-dialog::before,
+.sc-frame::before,
+.sc-panel::after,
+.sc-dialog::after,
+.sc-frame::after {
+  content: none;
+  position: absolute;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   4. Dialog (in-game menu, glue dialogs)
+   -------------------------------------------------------------------------- */
+.sc-dialog {
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  padding: 10px 14px 14px;
+}
+.sc-dialog-title {
+  margin: -2px -6px 10px;
+  padding: 4px 8px 6px;
+  text-align: center;
+  color: var(--sc-title);
+  font-family: var(--sc-font-title);
+  font-size: 1.15em;
+  letter-spacing: .04em;
+  text-shadow: 1px 1px 0 #000;
+  background: var(--sc-title-rule,
+    linear-gradient(var(--sc-frame-lo) 0 1px, var(--sc-frame-hi) 1px) left bottom / 100% 2px no-repeat);
+}
+.sc-dialog-body { flex: 1; }
+.sc-dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+}
+.sc-dialog-actions.is-end { justify-content: flex-end; }
+.sc-dialog-actions.is-split { justify-content: space-between; }
+
+/* Modal backdrop — SC1 darkens the game view with a 50% dither */
+.sc-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: rgba(0, 0, 0, .5);
+  background-image: conic-gradient(rgba(0,0,0,.35) 25%, transparent 0 50%, rgba(0,0,0,.35) 0 75%, transparent 0);
+  background-size: 2px 2px;
+  z-index: 100;
+}
+
+/* --------------------------------------------------------------------------
+   5. Buttons
+   -------------------------------------------------------------------------- */
+.sc-btn {
+  --_bevel-hi: var(--sc-frame-hi);
+  --_bevel-lo: var(--sc-frame-lo);
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  min-width: 96px;
+  height: 26px;
+  line-height: 24px;
+  --sc-btn-px: 14px;   /* horizontal padding; pressed state shifts the label 2px right */
+  padding: 0 var(--sc-btn-px);
+  font: inherit;
+  color: var(--sc-label);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  background: var(--sc-btn-bg);
+  border: 1px solid var(--sc-frame-dark);
+  border-radius: 0;
+  box-shadow:
+    inset 1px 1px 0 var(--_bevel-hi),
+    inset -1px -1px 0 var(--_bevel-lo),
+    inset 0 0 0 2px var(--sc-frame-mid);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-btn:hover,
+.sc-btn.is-hover {
+  color: var(--sc-label-hover);
+  background: var(--sc-btn-bg-hover);
+}
+.sc-btn:active,
+.sc-btn.is-active {
+  background: var(--sc-btn-bg-active);
+  box-shadow:
+    inset 1px 1px 0 var(--_bevel-lo),
+    inset -1px -1px 0 var(--_bevel-hi),
+    inset 0 0 0 2px var(--sc-frame-lo);
+  padding-top: 2px;
+  padding-left: calc(var(--sc-btn-px) + 2px);
+  padding-right: calc(var(--sc-btn-px) - 2px);
+}
+.sc-btn:focus-visible {
+  box-shadow:
+    inset 1px 1px 0 var(--_bevel-hi),
+    inset -1px -1px 0 var(--_bevel-lo),
+    inset 0 0 0 2px var(--sc-frame-mid),
+    0 0 0 1px var(--sc-accent-hi);
+}
+.sc-btn:disabled,
+.sc-btn.is-disabled {
+  color: var(--sc-label-disabled);
+  cursor: default;
+  pointer-events: none;
+  filter: saturate(.3);
+}
+.sc-btn > .sc-hk { color: var(--sc-label-hover); }
+.sc-btn:disabled > .sc-hk,
+.sc-btn.is-disabled > .sc-hk { color: inherit; }
+.sc-btn > .sc-glyph { display: inline-block; vertical-align: middle; width: 14px; height: 14px; }
+.sc-btn > .sc-glyph, .sc-btn > .sc-ico { margin-right: .4em; }
+
+.sc-btn-sm { --sc-btn-px: 8px; min-width: 0; height: 20px; line-height: 18px; font-size: .9em; }
+.sc-btn-lg { --sc-btn-px: 22px; min-width: 160px; height: 32px; line-height: 30px; font-size: 1.1em; }
+.sc-btn-block { display: block; width: 100%; }
+
+/* Glue-screen menu item: the big glowing labels of the main menu */
+.sc-glue {
+  display: block;
+  position: relative;
+  padding: 4px 0;
+  font-family: var(--sc-font-title);
+  font-size: 1.6em;
+  letter-spacing: .04em;
+  color: var(--sc-glue, var(--sc-accent));
+  text-shadow: 2px 2px 0 #000;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.sc-glue:hover,
+.sc-glue.is-hover {
+  color: var(--sc-glue-hover, var(--sc-accent-hi));
+  text-shadow:
+    2px 2px 0 #000,
+    0 0 6px var(--sc-glow),
+    0 0 14px var(--sc-glow);
+}
+.sc-glue small {
+  display: block;
+  font-size: .5em;
+  color: var(--sc-text);
+  letter-spacing: .02em;
+  text-shadow: 1px 1px 0 #000;
+}
+.sc-glue:disabled { color: var(--sc-c-grey); text-shadow: 2px 2px 0 #000; cursor: default; }
+
+/* Vertical in-game menu (F10) */
+.sc-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-menu > .sc-btn,
+.sc-menu > li > .sc-btn { width: 100%; }
+.sc-menu-sep { height: 6px; }
+
+/* --------------------------------------------------------------------------
+   6. Form controls
+   -------------------------------------------------------------------------- */
+.sc-label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--sc-text);
+}
+.sc-field { margin-bottom: 10px; }
+
+.sc-input,
+.sc-select,
+.sc-textarea {
+  display: block;
+  width: 100%;
+  height: 22px;
+  padding: 2px 5px;
+  font: inherit;
+  color: var(--sc-field-text);
+  caret-color: var(--sc-field-text);
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  border-radius: 0;
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-frame-mid),
+    1px 1px 0 1px var(--sc-frame-hi);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-textarea { height: auto; min-height: 64px; resize: vertical; }
+.sc-input::placeholder,
+.sc-textarea::placeholder { color: var(--sc-c-grey); opacity: 1; }
+.sc-input:focus,
+.sc-select:focus,
+.sc-textarea:focus {
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-accent),
+    1px 1px 0 1px var(--sc-accent-hi);
+}
+.sc-input:disabled { color: var(--sc-c-grey); }
+
+.sc-select {
+  padding-right: 22px;
+  cursor: pointer;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--sc-label) 50%) right 9px top 8px / 5px 5px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--sc-label) 50%) right 5px top 8px / 5px 5px no-repeat,
+    var(--sc-field-bg);
+}
+.sc-select option { background: #000; color: var(--sc-field-text); }
+
+/* Chat entry line: "To all: _" */
+.sc-chatline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, .55);
+  color: var(--sc-c-white);
+}
+.sc-chatline > .sc-input {
+  flex: 1;
+  height: auto;
+  padding: 0;
+  color: var(--sc-c-white);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Checkbox / radio — square SC1 tick boxes */
+.sc-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--sc-text);
+}
+.sc-check > input {
+  position: relative;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-check > input[type="radio"] { border-radius: 0; }
+.sc-check > input:checked::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--sc-c-green);
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, .45), 0 0 3px var(--sc-c-green);
+}
+.sc-check > input[type="radio"]:checked::after { inset: 3px; }
+.sc-check > input:focus-visible { box-shadow: 0 0 0 1px var(--sc-accent-hi); }
+.sc-check:hover { color: var(--sc-c-white); }
+.sc-check > input:disabled + span { color: var(--sc-c-grey); }
+
+/* Slider — Options › Sound / Music / Game speed */
+.sc-range {
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-range::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-range::-moz-range-track {
+  height: 4px;
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-range::-webkit-slider-thumb {
+  width: 10px;
+  height: 16px;
+  margin-top: -6px;
+  background: linear-gradient(90deg, var(--sc-frame-hi) 0 1px, var(--sc-frame) 1px calc(100% - 1px), var(--sc-frame-lo) 0);
+  border: 1px solid var(--sc-frame-dark);
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-range::-moz-range-thumb {
+  width: 8px;
+  height: 14px;
+  background: linear-gradient(90deg, var(--sc-frame-hi) 0 1px, var(--sc-frame) 1px calc(100% - 1px), var(--sc-frame-lo) 0);
+  border: 1px solid var(--sc-frame-dark);
+  border-radius: 0;
+}
+.sc-range:hover::-webkit-slider-thumb { background: linear-gradient(90deg, #fff 0 1px, var(--sc-frame-hi) 1px calc(100% - 1px), var(--sc-frame-lo) 0); }
+
+/* Slider labelled scale (Slowest … Fastest) */
+.sc-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: .85em;
+  color: var(--sc-text-dim);
+}
+
+/* --------------------------------------------------------------------------
+   7. List box (game list, map list, channel list) & scrollbars
+   -------------------------------------------------------------------------- */
+.sc-list {
+  margin: 0;
+  padding: 2px 0;
+  list-style: none;
+  overflow: auto;
+  max-height: 180px;
+  background: var(--sc-field-bg);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-frame-mid),
+    1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-list > li,
+.sc-list > .sc-list-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 6px;
+  color: var(--sc-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sc-list > li:hover,
+.sc-list > .sc-list-item:hover { color: var(--sc-c-white); }
+.sc-list > li.is-selected,
+.sc-list > li[aria-selected="true"],
+.sc-list > .sc-list-item.is-selected {
+  color: var(--sc-select-text);
+  background: var(--sc-select-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), inset 0 -1px 0 rgba(0, 0, 0, .5);
+}
+.sc-list > li.is-disabled { color: var(--sc-c-grey); cursor: default; }
+.sc-list > li.is-header {
+  color: var(--sc-c-yellow);
+  cursor: default;
+  background: none;
+}
+.sc-list .sc-list-meta { margin-left: auto; color: var(--sc-text-dim); }
+
+/* Race-coloured scrollbars — apply .sc-scroll to any overflow box */
+.sc-scroll,
+.sc-list,
+.sc-textarea {
+  scrollbar-color: var(--sc-scroll-thumb) var(--sc-scroll-track);
+}
+.sc-scroll::-webkit-scrollbar,
+.sc-list::-webkit-scrollbar,
+.sc-textarea::-webkit-scrollbar { width: 14px; height: 14px; }
+.sc-scroll::-webkit-scrollbar-track,
+.sc-list::-webkit-scrollbar-track,
+.sc-textarea::-webkit-scrollbar-track {
+  background: var(--sc-scroll-track);
+  box-shadow: inset 1px 0 0 var(--sc-frame-lo);
+}
+.sc-scroll::-webkit-scrollbar-thumb,
+.sc-list::-webkit-scrollbar-thumb,
+.sc-textarea::-webkit-scrollbar-thumb {
+  background: var(--sc-scroll-thumb);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: inset 1px 1px 0 var(--sc-frame-hi), inset -1px -1px 0 var(--sc-frame-lo);
+}
+.sc-scroll::-webkit-scrollbar-button:single-button,
+.sc-list::-webkit-scrollbar-button:single-button {
+  display: block;
+  height: 14px;
+  background-color: var(--sc-frame-mid);
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: inset 1px 1px 0 var(--sc-frame-hi), inset -1px -1px 0 var(--sc-frame-lo);
+}
+.sc-scroll::-webkit-scrollbar-corner,
+.sc-list::-webkit-scrollbar-corner { background: var(--sc-scroll-track); }
+
+/* --------------------------------------------------------------------------
+   8. Tabs (Battle.net / score screen)
+   -------------------------------------------------------------------------- */
+.sc-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 6px;
+  border-bottom: 2px solid var(--sc-frame-dark);
+  box-shadow: 0 1px 0 var(--sc-frame);
+}
+.sc-tab {
+  position: relative;
+  top: 2px;
+  padding: 3px 12px 4px;
+  font: inherit;
+  color: var(--sc-label-disabled);
+  background: var(--sc-btn-bg-active);
+  border: 1px solid var(--sc-frame-dark);
+  border-bottom: 0;
+  box-shadow: inset 1px 1px 0 var(--sc-frame-lo);
+  cursor: pointer;
+}
+.sc-tab:hover { color: var(--sc-label); }
+.sc-tab.is-active,
+.sc-tab[aria-selected="true"] {
+  color: var(--sc-label-hover);
+  background: var(--sc-btn-bg);
+  box-shadow: inset 1px 1px 0 var(--sc-frame-hi), inset -1px 0 0 var(--sc-frame-lo);
+  padding-bottom: 6px;
+  top: 2px;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   9. Tooltip (command card hover)
+   -------------------------------------------------------------------------- */
+.sc-tooltip {
+  display: inline-block;
+  padding: 3px 6px 4px;
+  color: var(--sc-c-pale);
+  background: var(--sc-tooltip-bg);
+  border: 1px solid var(--sc-tooltip-border, var(--sc-frame-mid));
+  box-shadow: 0 0 0 1px #000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sc-tooltip-cost {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+  color: var(--sc-c-white);
+}
+[data-sc-tip] { position: relative; }
+[data-sc-tip]:hover::after {
+  content: attr(data-sc-tip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  padding: 3px 6px 4px;
+  font-size: var(--sc-font-size);
+  color: var(--sc-c-pale);
+  background: var(--sc-tooltip-bg);
+  border: 1px solid var(--sc-tooltip-border, var(--sc-frame-mid));
+  box-shadow: 0 0 0 1px #000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   10. Resource bar (top-right of the game screen)
+   -------------------------------------------------------------------------- */
+.sc-resources {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 2px 6px;
+  color: var(--sc-c-green);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 #000;
+}
+.sc-res {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+}
+.sc-res::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--_icon) center / contain no-repeat;
+}
+.sc-res-mineral { --_icon: var(--sc-icon-mineral); }
+.sc-res-gas     { --_icon: var(--sc-icon-gas); }
+.sc-res-supply  { --_icon: var(--sc-icon-supply); }
+.sc-res.is-short { color: var(--sc-c-red); }
+
+/* Standalone inline icons */
+.sc-ico {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  background: var(--_icon) center / contain no-repeat;
+}
+.sc-ico-mineral { --_icon: var(--sc-icon-mineral); }
+.sc-ico-gas     { --_icon: var(--sc-icon-gas); }
+.sc-ico-supply  { --_icon: var(--sc-icon-supply); }
+
+/* --------------------------------------------------------------------------
+   11. Vitals: segmented hp / shield / energy bars & stat text
+   -------------------------------------------------------------------------- */
+.sc-bar {
+  --value: 100;          /* 0–100 */
+  --seg: 3px;            /* segment width incl. 1px gap */
+  --_fill: var(--sc-hp-high);
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: #000;
+  box-shadow: 0 0 0 1px #000;
+}
+.sc-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--value) * 1%);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(var(--seg) - 1px), #000 0 var(--seg)),
+    linear-gradient(rgba(255,255,255,.35) 0 1px, transparent 1px calc(100% - 1px), rgba(0,0,0,.35) 0),
+    var(--_fill);
+}
+.sc-bar.is-mid  { --_fill: var(--sc-hp-mid); }
+.sc-bar.is-low  { --_fill: var(--sc-hp-low); }
+.sc-bar-shield  { --_fill: var(--sc-shield); }
+.sc-bar-energy  { --_fill: var(--sc-energy); }
+.sc-bar-lg { height: 8px; --seg: 4px; }
+
+/* "45/45" style stat readouts */
+.sc-stat { color: var(--sc-hp-high); font-variant-numeric: tabular-nums; }
+.sc-stat.is-mid { color: var(--sc-hp-mid); }
+.sc-stat.is-low { color: var(--sc-hp-low); }
+.sc-stat-plain { color: var(--sc-c-white); font-variant-numeric: tabular-nums; }
+
+/* Build / research progress bar */
+.sc-progress {
+  --value: 0;
+  position: relative;
+  height: 10px;
+  background: #000;
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-progress::before {
+  content: "";
+  position: absolute;
+  inset: 1px auto 1px 1px;
+  width: calc((100% - 2px) * var(--value) / 100);
+  background:
+    linear-gradient(var(--sc-progress-hi) 0 1px, var(--sc-progress) 1px calc(100% - 1px), rgba(0,0,0,.4) 0);
+}
+.sc-progress-label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--sc-c-white);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   12. Command card (3×3 grid) & command buttons
+   -------------------------------------------------------------------------- */
+.sc-cmd {
+  display: grid;
+  grid-template-columns: repeat(var(--sc-cmd-cols, 3), var(--sc-cmd-size));
+  grid-auto-rows: var(--sc-cmd-size);
+  gap: 6px 8px;
+  padding: 4px;
+}
+.sc-cmd-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--sc-cmd-size);
+  height: var(--sc-cmd-size);
+  padding: 0;
+  color: var(--sc-icon);
+  background: var(--sc-cmd-bg, var(--sc-btn-bg));
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi),
+    inset -1px -1px 0 var(--sc-frame-lo),
+    inset 0 0 0 2px var(--sc-frame-mid),
+    inset 0 0 0 3px rgba(0, 0, 0, .55);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sc-cmd-btn:hover,
+.sc-cmd-btn.is-hover {
+  color: var(--sc-icon-hover);
+  background: var(--sc-cmd-bg-hover, var(--sc-cmd-bg, var(--sc-btn-bg)));
+}
+.sc-cmd-btn:hover > *,
+.sc-cmd-btn.is-hover > * { filter: brightness(1.35) drop-shadow(0 0 2px var(--sc-glow)); }
+.sc-cmd-btn:active,
+.sc-cmd-btn.is-active {
+  background: var(--sc-cmd-bg-active, var(--sc-btn-bg-active));
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    inset -1px -1px 0 var(--sc-frame-hi),
+    inset 0 0 0 2px var(--sc-frame-lo);
+}
+.sc-cmd-btn:active > *,
+.sc-cmd-btn.is-active > * { transform: translate(1px, 1px); }
+.sc-cmd-btn.is-selected { /* currently-targeting command */
+  color: var(--sc-c-white);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-lo),
+    inset -1px -1px 0 var(--sc-frame-hi),
+    inset 0 0 0 2px var(--sc-c-green);
+}
+.sc-cmd-btn:disabled,
+.sc-cmd-btn.is-disabled {
+  color: var(--sc-icon-disabled);
+  cursor: default;
+}
+.sc-cmd-btn:disabled > img,
+.sc-cmd-btn.is-disabled > img { filter: grayscale(1) brightness(.45); }
+.sc-cmd-btn > img { width: 28px; height: 28px; }
+.sc-cmd-empty { width: var(--sc-cmd-size); height: var(--sc-cmd-size); }
+
+/* Glyph icons — mask-based, coloured by currentColor */
+.sc-glyph {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: currentColor;
+  -webkit-mask: var(--_glyph) center / contain no-repeat;
+  mask: var(--_glyph) center / contain no-repeat;
+}
+.sc-glyph-move    { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 6h7V2l7 6-7 6v-4H1z'/%3E%3C/svg%3E"); }
+.sc-glyph-stop    { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill-rule='evenodd' d='M5 1h6l4 4v6l-4 4H5l-4-4V5zM4 7v2h8V7z'/%3E%3C/svg%3E"); }
+.sc-glyph-attack  { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M12 1h3v3l-7 7 2 2-2 1-2-2-3 3-2-2 3-3-2-2 1-2 2 2z'/%3E%3C/svg%3E"); }
+.sc-glyph-patrol  { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 5l4-4v3h9v2H5v3zM15 11l-4 4v-3H2v-2h9V7z'/%3E%3C/svg%3E"); }
+.sc-glyph-hold    { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill-rule='evenodd' d='M8 1l6 2v5c0 4-3 6-6 7-3-1-6-3-6-7V3zM7 4v8h2V4z'/%3E%3C/svg%3E"); }
+.sc-glyph-gather  { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M2 15l3-9 3 9zM8 15l3-13 3 13z'/%3E%3C/svg%3E"); }
+.sc-glyph-return  { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M15 6H8V2L1 8l7 6v-4h7z'/%3E%3C/svg%3E"); }
+.sc-glyph-build   { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M2 2h9v2h3v3h-3v1H8v7H5V8H2z'/%3E%3C/svg%3E"); }
+.sc-glyph-cancel  { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 4l3-3 4 4 4-4 3 3-4 4 4 4-3 3-4-4-4 4-3-3 4-4z'/%3E%3C/svg%3E"); }
+.sc-glyph-rally   { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M3 1h2v14H3zM5 2h9l-2 3 2 3H5z'/%3E%3C/svg%3E"); }
+.sc-glyph-upgrade { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M8 1l6 6h-4v8H6V7H2z'/%3E%3C/svg%3E"); }
+
+/* Hotkey badge in a cmd button corner (optional, not in SC1 — off by default) */
+.sc-cmd-btn[data-hk].show-hk::after {
+  content: attr(data-hk);
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font-size: 10px;
+  color: var(--sc-c-yellow);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* --------------------------------------------------------------------------
+   13. Console / HUD
+   SC1 layout (640×480): minimap | info panel | portrait | command card
+   -------------------------------------------------------------------------- */
+.sc-console {
+  position: relative;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 72px auto;
+  grid-template-areas: "map info portrait cmd";
+  align-items: end;
+  gap: 10px;
+  padding: 23px 10px 8px;
+  color: var(--sc-text);
+  /* Everything is drawn below the rim; skins draw a shaped edge into the rim with ::before */
+  --_rim: var(--sc-console-rim, 0px);
+  background-image:
+    var(--sc-console-edge, linear-gradient(var(--sc-frame-dark) 0 1px, var(--sc-frame-hi) 1px 2px, transparent 2px)),
+    var(--sc-console-texture),
+    var(--sc-console-bg);
+  background-position: 0 var(--_rim);
+  background-size: 100% calc(100% - var(--_rim));
+  background-repeat: no-repeat;
+}
+.sc-console > .sc-minimap   { grid-area: map; }
+.sc-console > .sc-info      { grid-area: info; }
+.sc-console > .sc-portrait  { grid-area: portrait; align-self: center; }
+.sc-console > .sc-cmd       { grid-area: cmd; }
+.sc-console::before,
+.sc-console::after { content: none; position: absolute; pointer-events: none; }
+@media (max-width: 640px) {
+  .sc-console {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "info info" "map cmd";
+    justify-content: space-between;
+  }
+  .sc-console > .sc-portrait { display: none; }
+  .sc-console > .sc-cmd { justify-self: end; }
+}
+
+/* Minimap */
+.sc-minimap {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: var(--sc-screen-shadow, 0 0 0 1px var(--sc-frame-lo), 0 0 0 3px var(--sc-frame-mid), 0 0 0 4px var(--sc-frame-dark));
+}
+.sc-minimap > img { width: 100%; height: 100%; object-fit: cover; }
+.sc-minimap-view {  /* white camera rectangle */
+  position: absolute;
+  left: var(--x, 10%);
+  top: var(--y, 10%);
+  width: 20%;
+  height: 15%;
+  border: 1px solid #fff;
+}
+.sc-minimap-dot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 3px;
+  height: 3px;
+  background: var(--sc-player, var(--sc-c-green));
+}
+.sc-minimap-dot.is-building { width: 4px; height: 4px; }
+.sc-minimap-ping {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 2px;
+  height: 2px;
+  outline: 1px solid var(--sc-c-red);
+  animation: sc-ping 1s steps(6) infinite;
+}
+@keyframes sc-ping {
+  from { outline-offset: 0; opacity: 1; }
+  to   { outline-offset: 10px; opacity: 0; }
+}
+
+/* Info panel: black screen in the middle of the console */
+.sc-info {
+  position: relative;
+  min-height: 112px;
+  padding: 8px 10px;
+  background: #000;
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: var(--sc-screen-shadow, 0 0 0 1px var(--sc-frame-lo), 0 0 0 3px var(--sc-frame-mid), 0 0 0 4px var(--sc-frame-dark));
+}
+.sc-unit {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 4px 12px;
+  align-items: start;
+}
+.sc-unit-wire {     /* wireframe slot */
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  color: var(--sc-hp-high);
+}
+.sc-unit-wire > img { width: 64px; height: 64px; }
+.sc-unit-wire.is-mid { color: var(--sc-hp-mid); }
+.sc-unit-wire.is-low { color: var(--sc-hp-low); }
+.sc-unit-name { color: var(--sc-c-white); margin-bottom: 2px; }
+.sc-unit-rank { color: var(--sc-c-pale); margin-bottom: 4px; }
+.sc-unit-kills { color: var(--sc-c-pale); }
+.sc-unit-vitals { display: grid; gap: 1px; text-align: center; font-size: .92em; }
+
+/* Unit stat icons row (armour / weapon upgrades) */
+.sc-upgrades { display: flex; gap: 4px; margin-top: 6px; }
+.sc-upgrade {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background: #101010;
+  border: 1px solid var(--sc-frame-lo);
+}
+.sc-upgrade > img { width: 100%; height: 100%; }
+.sc-upgrade[data-level]::after {
+  content: attr(data-level);
+  position: absolute;
+  right: 1px;
+  bottom: -1px;
+  font-size: 10px;
+  color: var(--sc-c-white);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Multi-select grid: 2 rows × 6 wireframe boxes */
+.sc-selection {
+  display: grid;
+  grid-template-columns: repeat(6, 34px);
+  grid-auto-rows: 34px;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, 34px);
+  gap: 3px 4px;
+}
+.sc-sel {
+  --_c: var(--sc-hp-high);
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--_c);
+  background: #000;
+  border: 1px solid #303030;
+  cursor: pointer;
+}
+.sc-sel:hover { border-color: var(--sc-frame-hi); }
+.sc-sel.is-mid { --_c: var(--sc-hp-mid); }
+.sc-sel.is-low { --_c: var(--sc-hp-low); }
+.sc-sel > img { width: 30px; height: 30px; }
+.sc-sel-pip { /* placeholder wireframe when no image */
+  width: 18px;
+  height: 22px;
+  border: 2px solid currentColor;
+  clip-path: polygon(50% 0, 100% 30%, 85% 100%, 15% 100%, 0 30%);
+  background: repeating-linear-gradient(currentColor 0 1px, transparent 1px 3px);
+  opacity: .9;
+}
+
+/* Portrait (talking head) with TV-static transition */
+.sc-portrait {
+  position: relative;
+  width: 60px;
+  height: 56px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--sc-frame-dark);
+  box-shadow: var(--sc-screen-shadow, 0 0 0 1px var(--sc-frame-lo), 0 0 0 3px var(--sc-frame-mid), 0 0 0 4px var(--sc-frame-dark));
+}
+.sc-portrait > img,
+.sc-portrait > video { width: 100%; height: 100%; object-fit: cover; }
+.sc-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.5) 0 1px, transparent 1px 2px),
+    repeating-conic-gradient(#fff 0 25%, #222 0 50%) 0 0 / 3px 3px,
+    repeating-conic-gradient(#888 0 25%, #000 0 50%) 1px 2px / 5px 4px;
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+.sc-portrait.is-static::after {
+  opacity: 1;
+  animation: sc-static .24s steps(4) infinite;
+}
+@keyframes sc-static {
+  0%   { background-position: 0 0, 0 0, 1px 2px; }
+  25%  { background-position: 0 1px, 2px 1px, 3px 0; }
+  50%  { background-position: 0 0, 1px 2px, 0 3px; }
+  75%  { background-position: 0 1px, 2px 0, 2px 1px; }
+  100% { background-position: 0 0, 0 1px, 1px 0; }
+}
+
+/* --------------------------------------------------------------------------
+   14. In-game messages, timers, notices
+   -------------------------------------------------------------------------- */
+.sc-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--sc-c-white);
+  text-shadow: 1px 1px 0 #000;
+}
+.sc-msg-from { color: var(--sc-player, var(--sc-c-white)); }
+.sc-msg-from::after { content: ": "; color: var(--sc-c-white); }
+.sc-msg.is-system { color: var(--sc-c-yellow); }
+.sc-msg.is-ally   { color: var(--sc-c-green); }
+.sc-msg.is-whisper { color: var(--sc-c-grey); }
+.sc-msg.is-fading { animation: sc-fade 6s steps(6) forwards; }
+@keyframes sc-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Centre-screen error: "Not enough minerals..." */
+.sc-notice {
+  display: inline-block;
+  color: var(--sc-c-white);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* UMS countdown timer box (top-left) */
+.sc-timer {
+  display: inline-block;
+  min-width: 52px;
+  padding: 1px 6px;
+  text-align: center;
+  color: var(--sc-c-white);
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, .55);
+  border: 1px solid var(--sc-frame-mid);
+  box-shadow: 0 0 0 1px #000;
+}
+
+/* Transmission text (mission briefing / cinematic subtitles) */
+.sc-transmission {
+  color: var(--sc-c-white);
+  text-shadow: 1px 1px 0 #000;
+}
+.sc-transmission .sc-speaker { color: var(--sc-c-yellow); }
+
+/* Mission objectives */
+.sc-objectives {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-objectives > li { position: relative; padding-left: 14px; margin-bottom: 4px; color: var(--sc-c-white); }
+.sc-objectives > li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: .45em;
+  width: 5px;
+  height: 5px;
+  background: var(--sc-c-yellow);
+  box-shadow: 1px 1px 0 #000;
+}
+.sc-objectives > li.is-done { color: var(--sc-c-grey); }
+.sc-objectives > li.is-done::before { background: var(--sc-c-green); }
+
+/* --------------------------------------------------------------------------
+   15. Score screen table
+   -------------------------------------------------------------------------- */
+.sc-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 3px;
+  font-variant-numeric: tabular-nums;
+}
+.sc-table th {
+  padding: 2px 8px;
+  font-weight: normal;
+  text-align: right;
+  color: var(--sc-c-yellow);
+}
+.sc-table th:first-child,
+.sc-table td:first-child { text-align: left; }
+.sc-table td {
+  padding: 3px 8px;
+  text-align: right;
+  color: var(--sc-c-white);
+  background: rgba(0, 0, 0, .55);
+  border-top: 1px solid var(--sc-frame-lo);
+  border-bottom: 1px solid var(--sc-frame-dark);
+}
+.sc-table td:first-child {
+  color: var(--sc-player, var(--sc-c-white));
+  border-left: 3px solid var(--sc-player, var(--sc-frame-mid));
+}
+.sc-table tr.is-total td { color: var(--sc-c-yellow); }
+
+/* Score bars (Units / Structures / Resources tallies) */
+.sc-scorebar {
+  --value: 0;
+  position: relative;
+  height: 12px;
+  background: #000;
+  border: 1px solid var(--sc-frame-dark);
+}
+.sc-scorebar::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--value) * 1%);
+  background: linear-gradient(rgba(255,255,255,.4) 0 1px, var(--sc-player, var(--sc-accent)) 1px calc(100% - 2px), rgba(0,0,0,.5) 0);
+}
+
+/* --------------------------------------------------------------------------
+   16. Selection circles & cursors (for game-view mockups)
+   -------------------------------------------------------------------------- */
+.sc-select-ring {
+  display: inline-block;
+  width: var(--w, 32px);
+  height: calc(var(--w, 32px) * .55);
+  border: 1px solid var(--sc-c-green);
+  border-radius: 50%;
+}
+.sc-select-ring.is-enemy   { border-color: var(--sc-p1); }
+.sc-select-ring.is-neutral { border-color: var(--sc-p8); }
+
+/* SC1 arrow cursor: green (own/none), red (enemy), yellow (neutral) */
+.sc-cursor {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M1 1l14 6-6 2-2 6z'/%3E%3Cpath fill='%2318a818' d='M2 2l11 5-5 2-2 5z'/%3E%3Cpath fill='%2380fc80' d='M2 2l11 5-6-1-1 6z'/%3E%3C/svg%3E") 1 1, default;
+}
+.sc-cursor-enemy {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M1 1l14 6-6 2-2 6z'/%3E%3Cpath fill='%23b41010' d='M2 2l11 5-5 2-2 5z'/%3E%3Cpath fill='%23fc6c6c' d='M2 2l11 5-6-1-1 6z'/%3E%3C/svg%3E") 1 1, default;
+}
+.sc-cursor-neutral {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M1 1l14 6-6 2-2 6z'/%3E%3Cpath fill='%23b4b410' d='M2 2l11 5-5 2-2 5z'/%3E%3Cpath fill='%23fcfc6c' d='M2 2l11 5-6-1-1 6z'/%3E%3C/svg%3E") 1 1, default;
+}
+
+/* --------------------------------------------------------------------------
+   17. Accessibility & motion
+   -------------------------------------------------------------------------- */
+.sc-sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc *, .sc *::before, .sc *::after { animation: none !important; }
+}
+/* ==========================================================================
+   STARCRAFT UI — terran skin  (scope: .sc-terran)
+   Cold gunmetal plating, bevels, corner bolt plates, stepped console top.
+   ========================================================================== */
+.sc-terran {
+  --sc-panel-bg: rgba(6, 10, 14, .86);
+  --sc-panel-bg-solid: #080c10;
+
+  --sc-frame-hi: #bcc4cc;
+  --sc-frame: #6e767e;
+  --sc-frame-mid: #4a5056;
+  --sc-frame-lo: #2a2e33;
+  --sc-frame-dark: #07080a;
+
+  --sc-accent: #3cb48c;
+  --sc-accent-hi: #a4f4cc;
+  --sc-glow: rgba(48, 220, 150, .5);
+  --sc-glue: #40cc90;
+  --sc-glue-hover: #c4fce0;
+
+  --sc-text-dim: #7884a0;
+  --sc-select-bg: #1c4250;
+
+  --sc-btn-bg: linear-gradient(#4a5159, #30353b 45%, #22262b 55%, #181b1f);
+  --sc-btn-bg-hover: linear-gradient(#5c646d, #3c4249 45%, #2c3136 55%, #1f2226);
+  --sc-btn-bg-active: linear-gradient(#121417, #1c1f23 50%, #2a2e33);
+
+  --sc-icon: #d0bc6c;
+  --sc-icon-hover: #fcf4a4;
+
+  --sc-scroll-track: #07090b;
+  --sc-scroll-thumb: #646c74;
+
+  --sc-console-bg: linear-gradient(#636c75, #4a525a 22%, #3a4148 60%, #262a2f);
+  /* brushed plate + two seam lines + a dark lower skirt */
+  --sc-console-texture:
+    linear-gradient(transparent calc(100% - 7px), #07080a calc(100% - 7px) calc(100% - 6px), #6e767e calc(100% - 6px) calc(100% - 5px), transparent 0),
+    repeating-linear-gradient(90deg, transparent 0 199px, rgba(0,0,0,.35) 199px 200px, rgba(255,255,255,.08) 200px 201px, transparent 201px 400px),
+    repeating-linear-gradient(rgba(255,255,255,.035) 0 1px, transparent 1px 3px);
+
+  /* 9x9 bolt plate, reused for every corner ornament */
+  --_tr-bolt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath fill='%2307080a' d='M0 0h9v9H0z'/%3E%3Cpath fill='%23828a92' d='M1 1h7v7H1z'/%3E%3Cpath fill='%23d4dce4' d='M1 1h7v1H2v6H1z'/%3E%3Cpath fill='%23353a40' d='M2 7h6V2h-1v5H2z'/%3E%3Cpath fill='%23262b30' d='M3 3h3v3H3z'/%3E%3Cpath fill='%23eef2f6' d='M3 3h2v1H4v1H3z'/%3E%3Cpath fill='%23a0a8b0' d='M4 4h1v1H4z'/%3E%3C/svg%3E");
+  --_tr-hazard: repeating-linear-gradient(-45deg, #9c8020 0 3px, #141517 3px 6px);
+
+  --sc-console-rim: 12px;
+  --sc-title-rule: var(--_tr-hazard) left bottom 1px / 100% 2px no-repeat,
+    linear-gradient(#07080a, #07080a) left bottom / 100% 4px no-repeat;
+  --sc-cmd-bg: linear-gradient(#5e666e, #464d54 50%, #353b41);
+  --sc-cmd-bg-hover: linear-gradient(#6c757e, #50575e 50%, #3c4248);
+  --sc-tooltip-bg: rgba(4, 8, 12, .88);
+  --sc-tooltip-border: var(--sc-frame);
+
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%23b4bcc4' d='M5 0h4v2H5z'/%3E%3Cpath fill='%23081c08' d='M2 2h10v12H2z'/%3E%3Cpath fill='%239ca4ac' d='M3 2h8v2H3z'/%3E%3Cpath fill='%23189c28' d='M3 4h8v8H3z'/%3E%3Cpath fill='%2360ec74' d='M4 4h2v8H4z'/%3E%3Cpath fill='%230c5814' d='M9 4h2v8H9zM3 7h8v1H3z'/%3E%3Cpath fill='%236c747c' d='M3 12h8v1H3z'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%2314181c' d='M1 3h12v10H1z'/%3E%3Cpath fill='%23788290' d='M2 4h10v8H2z'/%3E%3Cpath fill='%23c4ccd4' d='M2 4h10v1H2z'/%3E%3Cpath fill='%233c4248' d='M2 11h10v1H2z'/%3E%3Cpath fill='%2314181c' d='M3 0h8v4H3z'/%3E%3Cpath fill='%239aa2aa' d='M4 1h6v2H4z'/%3E%3Cpath fill='%23dce4ec' d='M4 1h6v1H4z'/%3E%3Cpath fill='%232c3238' d='M4 6h6v4H4z'/%3E%3Cpath fill='%2338f048' d='M5 7h1v2H5zM8 7h1v2H8z'/%3E%3C/svg%3E");
+}
+
+/* --- Frames: bolt plates on all four corners (sit on the 7px frame ring) --- */
+.sc-terran .sc-panel::before,
+.sc-terran .sc-dialog::before,
+.sc-terran .sc-frame::before {
+  content: "";
+  inset: -2px;
+  background:
+    var(--_tr-bolt) left top / 9px 9px no-repeat,
+    var(--_tr-bolt) right top / 9px 9px no-repeat,
+    var(--_tr-bolt) left bottom / 9px 9px no-repeat,
+    var(--_tr-bolt) right bottom / 9px 9px no-repeat;
+}
+
+/* Dialogs: steel clamps across the middle of the top and bottom edges */
+.sc-terran .sc-dialog::after {
+  content: "";
+  inset: -3px 0;
+  --_c: linear-gradient(90deg, #07080a 0 1px, #bcc4cc 1px 2px, #6e767e 2px calc(100% - 2px), #2a2e33 0 calc(100% - 1px), #07080a 0);
+  background:
+    linear-gradient(#07080a 0 1px, transparent 1px calc(100% - 1px), #07080a 0) center top / 36px 6px no-repeat,
+    var(--_c) center top / 36px 6px no-repeat,
+    linear-gradient(#07080a 0 1px, transparent 1px calc(100% - 1px), #07080a 0) center bottom / 36px 6px no-repeat,
+    var(--_c) center bottom / 36px 6px no-repeat;
+}
+
+/* Dialog title: thin hazard rule under the yellow caption */
+.sc-terran .sc-dialog-title { padding-bottom: 8px; }
+
+
+
+/* --- Console: stepped silhouette (high behind minimap + command card) --- */
+.sc-terran .sc-console {
+  --_l: min(166px, 42%);
+  --_r: min(158px, 38%);
+}
+.sc-terran .sc-console::before {
+  content: "";
+  inset: 0 0 auto;
+  height: 24px;
+  clip-path: polygon(0 0, var(--_l) 0, calc(var(--_l) + 12px) 12px,
+    calc(100% - var(--_r) - 12px) 12px, calc(100% - var(--_r)) 0, 100% 0, 100% 100%, 0 100%);
+  background:
+    /* top edge of raised blocks */
+    linear-gradient(#07080a 0 1px, #bcc4cc 1px 2px, transparent 2px) left top / 100% 2px no-repeat,
+    /* slope edges (approximated as dark wedges) */
+    linear-gradient(45deg, transparent calc(50% - 1px), #07080a 0 calc(50% + 1px), transparent 0) var(--_l) 0 / 12px 12px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1px), #07080a 0 calc(50% + 1px), transparent 0) calc(100% - var(--_r) - 12px) 0 / 12px 12px no-repeat,
+    /* raised plates: bottom seam at 22px */
+    linear-gradient(#6c757e, #535b63 60%, #464d54 21px, #07080a 21px 22px, #8a929a 22px 23px, transparent 23px) left top / calc(var(--_l) + 12px) 100% no-repeat,
+    linear-gradient(#6c757e, #535b63 60%, #464d54 21px, #07080a 21px 22px, #8a929a 22px 23px, transparent 23px) right top / calc(var(--_r) + 12px) 100% no-repeat,
+    /* low middle edge at 12px */
+    linear-gradient(transparent 12px, #07080a 12px 13px, #a4acb4 13px 14px, transparent 14px);
+}
+.sc-terran .sc-console::after {
+  content: "";
+  inset: 0;
+  background:
+    var(--_tr-bolt) 5px 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) calc(var(--_l) - 14px) 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) calc(100% - var(--_r) + 5px) 7px / 9px 9px no-repeat,
+    var(--_tr-bolt) right 5px top 7px / 9px 9px no-repeat,
+    var(--_tr-hazard) left bottom / 100% 2px no-repeat,
+    linear-gradient(#07080a, #07080a) left bottom / 100% 3px no-repeat;
+}
+/* ==========================================================================
+   STARCRAFT UI — zerg skin  (scope: .sc-zerg)
+   Maroon flesh, chitin/bone highlights, claw corners, lumpy spined console.
+   ========================================================================== */
+.sc-zerg {
+  --sc-panel-bg: rgba(14, 4, 6, .86);
+  --sc-panel-bg-solid: #100406;
+
+  --sc-frame-hi: #c8a070;
+  --sc-frame: #7a3c26;
+  --sc-frame-mid: #4e2016;
+  --sc-frame-lo: #2c0e0c;
+  --sc-frame-dark: #0e0404;
+  /* mottled flesh: three offset blotch tiles as SVG patterns (texture layers are drawn full-size) */
+  --sc-console-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3Cpattern id='a' width='13' height='9' patternUnits='userSpaceOnUse'%3E%3Cellipse cx='4' cy='3' rx='3' ry='2' fill='rgba(110,36,90,.35)'/%3E%3C/pattern%3E%3Cpattern id='b' x='5' y='4' width='17' height='11' patternUnits='userSpaceOnUse'%3E%3Cellipse cx='5' cy='3' rx='4' ry='2' fill='rgba(0,0,0,.28)'/%3E%3C/pattern%3E%3Cpattern id='c' x='2' y='7' width='23' height='17' patternUnits='userSpaceOnUse'%3E%3Cellipse cx='6' cy='4' rx='5' ry='3' fill='rgba(170,90,60,.16)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23a)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23b)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23c)'/%3E%3C/svg%3E");
+
+  --sc-accent: #d8701c;
+  --sc-accent-hi: #fcc050;
+  --sc-glow: rgba(244, 100, 16, .6);
+  --sc-glue: #e88420;
+  --sc-glue-hover: #fce070;
+
+  --sc-text-dim: #8c6c5c;
+  --sc-title: #fcc838;
+  --sc-select-bg: #4e1a32;
+
+  --sc-btn-bg: linear-gradient(#5c2a1a, #3c180e 50%, #2a0e10 60%, #180608);
+  --sc-btn-bg-hover: linear-gradient(#7a3a24, #4e2014 50%, #321410 60%, #1e0808);
+  --sc-btn-bg-active: linear-gradient(#120404, #1e0a08 50%, #321410);
+
+  --sc-icon: #d8b478;
+  --sc-icon-hover: #fce8a8;
+  --sc-icon-disabled: #4c3028;
+
+  --sc-scroll-track: #0c0404;
+  --sc-scroll-thumb: #6c3020;
+
+  --sc-console-rim: 20px;
+  --sc-screen-shadow: inset 0 0 0 1px rgba(76, 24, 60, .7), 0 0 0 1px #000, 0 0 0 2px var(--sc-frame-lo),
+    0 0 0 3px var(--sc-frame-mid), 0 0 0 4px var(--sc-frame), 1px 1px 0 4px var(--sc-frame-hi), 0 0 0 5px var(--sc-frame-dark);
+  --sc-console-bg: linear-gradient(#5a2618, #44180e 25%, #2c0e0c 65%, #1a0606);
+
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%231c1408' d='M5 0h4v2h1l2 2v2l1 1v5l-2 2H3l-2-2V7l1-1V4l2-2h1z'/%3E%3Cpath fill='%238c5c2c' d='M6 1h2v2H6z'/%3E%3Cpath fill='%234c6418' d='M4 3h6l1 1v2l1 1v4l-1 2H3l-1-2V7l1-1V4z'/%3E%3Cpath fill='%2394b03c' d='M4 4h3v1H5v4H4zM3 7h1v2H3z'/%3E%3Cpath fill='%232c3410' d='M8 7h2v2H8zM5 11h3v1H5z'/%3E%3Cpath fill='%237c5428' d='M10 5h1v1h-1zM9 10h2v1H9z'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%23140806' d='M4 0h6l3 3v5l-2 2v4H2v-4L1 8V3z'/%3E%3Cpath fill='%237c4428' d='M4 1h6l2 2v4l-2 2H4L2 7V3z'/%3E%3Cpath fill='%23c49c64' d='M4 1h6l1 1H5L3 4v2H2V3z'/%3E%3Cpath fill='%233c1810' d='M3 6h8v1H3z'/%3E%3Cpath fill='%23b450a0' d='M6 4h2v1H6z'/%3E%3Cpath fill='%23a07448' d='M3 9h1v4H3zM6 9h1v3H6zM9 9h1v4H9zM11 9h1v2h-1z'/%3E%3C/svg%3E");
+  --_zclaw: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23140806' d='M0 0l7 2 9 2v3l-7 1-1 1-1 7H4L2 7z'/%3E%3Cpath fill='%237c4a2c' d='M1 1l6 2 8 2v1l-7 1-1 1-1 7H5L3 7z'/%3E%3Cpath fill='%23d8bc88' d='M1 1l6 2h5L6 4 4 6v5L3 7z'/%3E%3Cpath fill='%235c2818' d='M5 5h3v3H5z'/%3E%3Cpath fill='%23b48858' d='M5 5h2v1H5z'/%3E%3Cpath fill='%23140806' d='M6 6h1v1H6z'/%3E%3C/svg%3E") left top / 16px 16px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cg transform='matrix(-1 0 0 1 16 0)'%3E%3Cpath fill='%23140806' d='M0 0l7 2 9 2v3l-7 1-1 1-1 7H4L2 7z'/%3E%3Cpath fill='%237c4a2c' d='M1 1l6 2 8 2v1l-7 1-1 1-1 7H5L3 7z'/%3E%3Cpath fill='%23d8bc88' d='M1 1l6 2h5L6 4 4 6v5L3 7z'/%3E%3Cpath fill='%235c2818' d='M5 5h3v3H5z'/%3E%3Cpath fill='%23b48858' d='M5 5h2v1H5z'/%3E%3Cpath fill='%23140806' d='M6 6h1v1H6z'/%3E%3C/g%3E%3C/svg%3E") right top / 16px 16px no-repeat;
+}
+
+/* Claw corners: ::before = top pair, ::after = bottom pair (flipped) */
+.sc-zerg .sc-dialog::before, .sc-zerg .sc-dialog::after,
+.sc-zerg .sc-panel::before, .sc-zerg .sc-panel::after,
+.sc-zerg .sc-frame::before, .sc-zerg .sc-frame::after {
+  content: "";
+  inset: -7px;
+  background: var(--_zclaw);
+}
+.sc-zerg .sc-dialog::after, .sc-zerg .sc-panel::after, .sc-zerg .sc-frame::after { transform: scaleY(-1); }
+
+/* Console: the 20px rim holds the lumpy, spined carapace edge */
+.sc-zerg .sc-console::before {
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 168 22' shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cpath id='a' d='M0 22V11l6-3h8l6-4h12l6 2h10l8-4h14l6 2h10l8 3h10l8 2 6 3h8l8 3 8 3 6 3 4 3z'/%3E%3C/defs%3E%3Cpath fill='%23d8bc88' d='M18 10L9 0l4 1 9 7zM62 4l-3-4h2l5 4zM100 6l4-6 1 2-1 5zM130 12l9-9-1 3-4 7z'/%3E%3Cuse href='%23a' fill='%23140806'/%3E%3Cuse href='%23a' y='1' fill='%23a0744c'/%3E%3Cuse href='%23a' y='2' fill='%237c3c28'/%3E%3Cuse href='%23a' y='4' fill='%235a2618'/%3E%3Cpath fill='%234c2038' d='M30 9h8v1h-8zM70 7h10v1H70zM112 11h6v1h-6z'/%3E%3Cpath fill='%23140806' d='M44 9h2v1h-2zM88 8h1v1h-1zM136 15h2v1h-2z'/%3E%3C/svg%3E") left bottom / 168px 22px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 156 22' shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cpath id='a' d='M0 22l6-4 10-2 8-3h10l8-4h12l6-3h16l8 2h10l6-3h12l8 3h10l8 4 8 2 10 3v8z'/%3E%3C/defs%3E%3Cpath fill='%23d8bc88' d='M30 13l-6-8 9 6zM64 6l-3-6 6 5zM110 5l5-5-1 6zM146 15l9-9-2 9z'/%3E%3Cuse href='%23a' fill='%23140806'/%3E%3Cuse href='%23a' y='1' fill='%23a0744c'/%3E%3Cuse href='%23a' y='2' fill='%237c3c28'/%3E%3Cuse href='%23a' y='4' fill='%235a2618'/%3E%3Cpath fill='%234c2038' d='M40 12h10v1H40zM90 9h8v1h-8zM126 11h6v1h-6z'/%3E%3Cpath fill='%23140806' d='M56 10h2v1h-2zM104 9h1v1h-1z'/%3E%3C/svg%3E") right bottom / 156px 22px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 22' shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cpath id='a' d='M0 22v-7l4-2h6l4 2h6l5-3h4l4 2h4l3 1h4v7z'/%3E%3C/defs%3E%3Cpath fill='%23d8bc88' d='M0 0'/%3E%3Cuse href='%23a' fill='%23140806'/%3E%3Cuse href='%23a' y='1' fill='%23a0744c'/%3E%3Cuse href='%23a' y='2' fill='%237c3c28'/%3E%3Cuse href='%23a' y='4' fill='%235a2618'/%3E%3Cpath fill='%23140806' d='M7 17h2v1H7zM30 16h1v1h-1z'/%3E%3C/svg%3E") 0 bottom / 44px 22px repeat-x;
+}
+
+/* ==========================================================================
+   STARCRAFT UI — protoss skin  (scope: .sc-protoss)
+   Polished gold/bronze trim, dark teal stone, khaydarin crystal accents.
+   ========================================================================== */
+.sc-protoss {
+  --sc-panel-bg: rgba(2, 22, 34, .86);
+  --sc-panel-bg-solid: #03161f;
+
+  --sc-frame-hi: #fcf4a8;
+  --sc-frame: #d0a040;
+  --sc-frame-mid: #946424;
+  --sc-frame-lo: #543410;
+  --sc-frame-dark: #140c00;
+
+  --sc-accent: #38c0f0;
+  --sc-accent-hi: #b0f4fc;
+  --sc-glow: rgba(56, 192, 248, .6);
+
+  --sc-text-dim: #6c90a4;
+  --sc-title: #fce064;
+  --sc-label: #e8dc50;
+  --sc-label-hover: #fff;
+  --sc-label-disabled: #6c6450;
+
+  --sc-btn-bg: linear-gradient(#18404c, #0c2a34 55%, #061c24);
+  --sc-btn-bg-hover: linear-gradient(#24586a, #123c4a 55%, #0a2834);
+  --sc-btn-bg-active: linear-gradient(#04141a, #0a2430 50%, #103440);
+
+  --sc-select-bg: linear-gradient(#105c78, #0a4058);
+  --sc-icon: #e0c058;
+  --sc-icon-hover: #fcf4b0;
+  --sc-icon-disabled: #4c4434;
+
+  --sc-scroll-track: #020c10;
+  --sc-scroll-thumb: #a87c30;
+
+  --_pt-stone: #2a3438;
+  --sc-console-bg: linear-gradient(var(--_pt-stone), #1a2428 45%, #0c1216);
+  --sc-console-rim: 24px;
+  --sc-console-edge: none;
+  --sc-tooltip-bg: rgba(2, 20, 30, .9);
+  --sc-console-texture: linear-gradient(90deg, rgba(252, 232, 160, .06), transparent 25% 75%, rgba(252, 232, 160, .06));
+
+  --sc-glue: #3cacdc;
+  --sc-glue-hover: #b8fcff;
+
+  /* Vespene: green gas in a gold-trimmed canister */
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%23946424' d='M4 0h6v2h2v12H2V2h2z'/%3E%3Cpath fill='%23fcf4a8' d='M4 0h6v1H4zM2 2h10v1H2z'/%3E%3Cpath fill='%230c6c14' d='M3 4h8v8H3z'/%3E%3Cpath fill='%2350e850' d='M4 4h3v8H4z'/%3E%3Cpath fill='%23d0a040' d='M3 3h8v1H3zM3 12h8v1H3z'/%3E%3C/svg%3E");
+  /* Supply: Pylon — blue khaydarin crystal on a gold base */
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' shape-rendering='crispEdges'%3E%3Cpath fill='%231c4cb8' d='M7 0l4 5-4 5-4-5z'/%3E%3Cpath fill='%2390dcfc' d='M7 0v10L3 5z'/%3E%3Cpath fill='%23946424' d='M1 10h12l-2 4H3z'/%3E%3Cpath fill='%23fcf4a8' d='M1 10h12v1H1z'/%3E%3C/svg%3E");
+
+  /* ornament building blocks */
+  --_gem: radial-gradient(closest-side, #f0fcff 22%, #48ccf8 34% 58%, #1048a0 66% 76%, #fce890 80% 88%, #3c2808 92%, #0000);
+  --_halo: radial-gradient(closest-side, rgba(56, 192, 248, .45), #0000);
+}
+
+/* --- Dialogs, panels, frames: gold crest + blue gems ------------------- */
+.sc-protoss .sc-dialog::before {
+  content: "";
+  top: -9px;
+  left: 50%;
+  width: 76px;
+  height: 11px;
+  margin-left: -38px;
+  background:
+    radial-gradient(closest-side, #946424 96%, #0000) 50% 3px / 70px 20px no-repeat,
+    radial-gradient(closest-side, #d0a040 96%, #0000) 50% 1px / 74px 22px no-repeat,
+    radial-gradient(closest-side, #fcf4a8 96%, #0000) 50% 0 / 76px 24px no-repeat;
+  filter: drop-shadow(0 -1px 0 #140c00);
+}
+.sc-protoss .sc-dialog::after {
+  content: "";
+  inset: -6px;
+  background:
+    var(--_gem) 50% 0 / 16px 12px,
+    var(--_halo) 50% 0 / 20px 12px,
+    var(--_gem) 0 0 / 12px 12px,
+    var(--_gem) 100% 0 / 12px 12px,
+    var(--_gem) 0 100% / 12px 12px,
+    var(--_gem) 100% 100% / 12px 12px;
+  background-repeat: no-repeat;
+}
+.sc-protoss .sc-panel::after,
+.sc-protoss .sc-frame::after {
+  content: "";
+  inset: -4px;
+  background:
+    var(--_gem) 0 0 / 10px 10px,
+    var(--_gem) 100% 0 / 10px 10px,
+    var(--_gem) 0 100% / 10px 10px,
+    var(--_gem) 100% 100% / 10px 10px;
+  background-repeat: no-repeat;
+}
+.sc-protoss .sc-dialog-title { padding-top: 6px; }
+
+/* --- Console: arched gold top edge over a transparent 24px band ------ */
+.sc-protoss .sc-console {
+  --_s: radial-gradient(closest-side, var(--_pt-stone) 98%, #0000);
+  --_b: radial-gradient(closest-side, #946424 98%, #0000);
+  --_g: radial-gradient(closest-side, #d0a040 98%, #0000);
+  --_h: radial-gradient(closest-side, #fcf4a8 98%, #0000);
+  --_d: radial-gradient(closest-side, #140c00 98%, #0000);
+}
+.sc-protoss .sc-console::before {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  background:
+    /* stone */
+    var(--_s) 50% 8px / calc(40% - 14px) 46px,
+    var(--_s) -9px 12px / 158px 36px,
+    var(--_s) right -9px top 12px / 158px 36px,
+    linear-gradient(var(--_pt-stone) 0 0) 0 18px / 100% 7px,
+    /* bronze */
+    var(--_b) 50% 6px / calc(40% - 10px) 50px,
+    var(--_b) -11px 10px / 162px 40px,
+    var(--_b) right -11px top 10px / 162px 40px,
+    linear-gradient(#946424 0 0) 0 16px / 100% 9px,
+    /* gold body */
+    var(--_g) 50% 3px / calc(40% - 4px) 56px,
+    var(--_g) -14px 7px / 168px 46px,
+    var(--_g) right -14px top 7px / 168px 46px,
+    linear-gradient(#d0a040 0 0) 0 13px / 100% 12px,
+    /* highlight */
+    var(--_h) 50% 2px / calc(40% - 2px) 58px,
+    var(--_h) -15px 6px / 170px 48px,
+    var(--_h) right -15px top 6px / 170px 48px,
+    linear-gradient(#fcf4a8 0 0) 0 12px / 100% 13px,
+    /* outline */
+    var(--_d) 50% 1px / 40% 60px,
+    var(--_d) -16px 5px / 172px 50px,
+    var(--_d) right -16px top 5px / 172px 50px,
+    linear-gradient(#140c00 0 0) 0 11px / 100% 14px;
+  background-repeat: no-repeat;
+}
+.sc-protoss .sc-console::after {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background:
+    var(--_gem) 50% 8px / 18px 12px,
+    var(--_halo) 50% 6px / 30px 16px,
+    var(--_gem) 64px 11px / 12px 10px,
+    var(--_gem) right 64px top 11px / 12px 10px;
+  background-repeat: no-repeat;
+}
+/* ==========================================================================
+   STARCRAFT UI — modern SC1 layer  (scope: .sc-hd, combined with sc-terran|sc-zerg|sc-protoss)
+   Remastered-style: same frames/ornaments/palette, anti-aliased type,
+   2px bevels, soft depth, accent glows. Only race-neutral rules here.
+   ========================================================================== */
+.sc-hd, .sc-hd .sc {
+  --sc-font: "Chakra Petch", "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  --sc-font-title: "Rajdhani", "Chakra Petch", "Segoe UI", sans-serif;
+  --sc-font-size: 14px;
+  --sc-line: 1.4;
+  --sc-bevel: 2px;
+  --sc-cmd-size: 40px;
+  /* SC1 text colours, softened a touch for anti-aliased strokes */
+  --sc-c-pale: #c2c6f0;
+  --sc-c-yellow: #ecdc50;
+  --sc-c-green: #3cf04c;
+  --sc-c-red: #e43434;
+  --sc-c-grey: #8c8c96;
+  --sc-hp-high: #3cf04c;
+  --_hd-drop: 0 12px 30px rgba(0,0,0,.6), 0 3px 8px rgba(0,0,0,.55);
+  --_hd-ease: .13s ease-out;
+  letter-spacing: .015em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: auto;
+  image-rendering: auto;
+  text-rendering: optimizeLegibility;
+}
+.sc-hd :is(h1, h2, h3, h4, .sc-h1, .sc-h2, .sc-h3) { font-weight: 700; letter-spacing: .04em; line-height: 1.15; }
+.sc-hd :is(h1, .sc-h1) { font-size: 2.3em; text-shadow: 0 2px 0 #000, 0 0 18px rgba(236,220,80,.18); }
+.sc-hd :is(h2, .sc-h2) { font-size: 1.6em; }
+.sc-hd :is(h3, .sc-h3) { font-size: 1.25em; }
+.sc-hd :is(.sc-messages, .sc-notice, .sc-transmission, .sc-resources, .sc-shadow) { text-shadow: 0 1px 2px #000, 0 0 1px #000; }
+.sc-hd .sc-resources { font-weight: 600; }
+.sc-hd .sc-res::before { width: 16px; height: 16px; }
+.sc-hd .sc-table th { font-weight: 600; }
+
+/* --- Frames: 2px bevel + soft drop ------------------------------------ */
+.sc-hd :is(.sc-frame, .sc-panel, .sc-dialog) {
+  background-image: linear-gradient(rgba(255,255,255,.045), transparent 90px);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi),
+    inset -1px -1px 0 var(--sc-frame-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--sc-frame-hi) 45%, var(--sc-frame)),
+    inset -2px -2px 0 color-mix(in srgb, var(--sc-frame-lo) 60%, var(--sc-frame)),
+    inset 0 0 0 4px var(--sc-frame),
+    inset 0 0 0 5px var(--sc-frame-mid),
+    inset 0 0 0 6px var(--sc-frame-dark),
+    inset 0 10px 20px -12px rgba(0,0,0,.9),
+    0 0 0 1px rgba(0,0,0,.7),
+    var(--_hd-drop);
+}
+.sc-hd .sc-dialog { -webkit-backdrop-filter: blur(6px) saturate(1.2); backdrop-filter: blur(6px) saturate(1.2); }
+.sc-hd .sc-dialog-title {
+  font-weight: 700;
+  font-size: 1.3em;
+  letter-spacing: .07em;
+  text-shadow: 0 1px 0 #000, 0 0 10px rgba(236,220,80,.22);
+}
+.sc-hd :is(.sc-well, .sc-list, .sc-input, .sc-select, .sc-textarea) {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.8), inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+
+/* --- Buttons ---------------------------------------------------------- */
+.sc-hd .sc-btn {
+  --sc-btn-px: 16px;
+  --_hd-ring: var(--sc-frame-mid);
+  --_hd-out: 0 1px 3px rgba(0,0,0,.7);
+  height: 30px;
+  line-height: 28px;
+  font-weight: 500;
+  text-shadow: 0 1px 1px #000, 0 0 4px rgba(0,0,0,.6);
+  transition: color var(--_hd-ease), box-shadow var(--_hd-ease), filter var(--_hd-ease);
+  box-shadow:
+    inset 1px 1px 0 var(--_bevel-hi), inset -1px -1px 0 var(--_bevel-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--_bevel-hi) 30%, transparent),
+    inset -2px -2px 0 color-mix(in srgb, var(--_bevel-lo) 70%, transparent),
+    inset 0 0 0 3px var(--_hd-ring),
+    inset 0 12px 10px -8px rgba(255,255,255,.07),
+    var(--_hd-out);
+}
+.sc-hd .sc-btn-sm { --sc-btn-px: 10px; height: 24px; line-height: 22px; }
+.sc-hd .sc-btn-lg { --sc-btn-px: 26px; height: 38px; line-height: 36px; }
+.sc-hd .sc-btn:is(:hover, .is-hover) { --_hd-out: 0 1px 3px rgba(0,0,0,.7), 0 0 0 1px var(--sc-accent), 0 0 12px var(--sc-glow); text-shadow: 0 1px 1px #000, 0 0 8px var(--sc-glow); }
+.sc-hd .sc-btn:is(:active, .is-active) {
+  --_bevel-hi: var(--sc-frame-lo);
+  --_bevel-lo: var(--sc-frame-hi);
+  --_hd-ring: var(--sc-frame-lo);
+  --_hd-out: 0 0 0 transparent;
+}
+.sc-hd :is(.sc-btn, .sc-cmd-btn, .sc-tab, .sc-glue, .sc-sel, .sc-range, .sc-check > input):focus-visible {
+  outline: 2px solid var(--sc-accent-hi);
+  outline-offset: 2px;
+}
+.sc-hd .sc-glue {
+  font-weight: 700;
+  font-size: 1.85em;
+  line-height: 1.1;
+  letter-spacing: .03em;
+  text-shadow: 0 2px 0 #000, 0 0 10px rgba(0,0,0,.8);
+  transition: color var(--_hd-ease), text-shadow var(--_hd-ease);
+}
+.sc-hd .sc-glue:is(:hover, .is-hover) { text-shadow: 0 2px 0 #000, 0 0 8px var(--sc-glow), 0 0 22px var(--sc-glow); }
+.sc-hd .sc-glue small { font-family: var(--sc-font); font-weight: 400; font-size: .44em; letter-spacing: .03em; text-shadow: 0 1px 1px #000; }
+
+/* --- Form controls ---------------------------------------------------- */
+.sc-hd :is(.sc-input, .sc-select) { height: 28px; padding: 3px 8px; }
+.sc-hd .sc-textarea { padding: 5px 8px; }
+.sc-hd :is(.sc-input, .sc-select, .sc-textarea) { transition: box-shadow var(--_hd-ease); }
+.sc-hd :is(.sc-input, .sc-select, .sc-textarea):focus {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.8), 0 0 0 1px var(--sc-accent), 1px 1px 0 1px var(--sc-accent-hi), 0 0 10px var(--sc-glow);
+}
+.sc-hd .sc-chatline > .sc-input { height: auto; padding: 0; box-shadow: none; }
+.sc-hd .sc-select {
+  padding-right: 26px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--sc-label) 50%) right 12px top 11px / 6px 6px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--sc-label) 50%) right 7px top 11px / 6px 6px no-repeat,
+    var(--sc-field-bg);
+}
+.sc-hd .sc-label { margin-bottom: 4px; }
+.sc-hd .sc-check { gap: 8px; }
+.sc-hd .sc-check > input {
+  width: 16px;
+  height: 16px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.9), 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+  transition: box-shadow var(--_hd-ease);
+}
+.sc-hd .sc-check:hover > input { box-shadow: 0 0 0 1px var(--sc-accent), 1px 1px 0 1px var(--sc-accent-hi), 0 0 8px var(--sc-glow); }
+.sc-hd .sc-check > input:checked::after {
+  inset: 3px;
+  background: linear-gradient(#b4ffb8, var(--sc-c-green) 45%, #14a020);
+  box-shadow: 0 0 6px rgba(60,240,76,.7);
+}
+.sc-hd .sc-range { height: 22px; }
+.sc-hd .sc-range::-webkit-slider-runnable-track {
+  background: linear-gradient(#000, #0c0e10);
+  box-shadow: inset 0 1px 2px #000, 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-hd .sc-range::-webkit-slider-thumb {
+  width: 12px;
+  height: 20px;
+  margin-top: -8px;
+  background: linear-gradient(90deg, var(--sc-frame-hi) 0 2px, var(--sc-frame) 2px 60%, var(--sc-frame-mid) calc(100% - 2px), var(--sc-frame-lo) 0);
+  box-shadow: 0 1px 3px rgba(0,0,0,.8);
+  transition: box-shadow var(--_hd-ease);
+}
+.sc-hd .sc-range:hover::-webkit-slider-thumb { box-shadow: 0 1px 3px #000, 0 0 8px var(--sc-glow); }
+.sc-hd .sc-range::-moz-range-thumb { width: 10px; height: 18px; }
+
+/* --- Lists, scrollbars, tabs, tooltips -------------------------------- */
+.sc-hd .sc-list > :is(li, .sc-list-item) { padding: 3px 8px; transition: color var(--_hd-ease), background-color var(--_hd-ease); }
+.sc-hd .sc-list > :is(li, .sc-list-item):not(.is-selected, [aria-selected="true"], .is-header, .is-disabled):hover { background-color: rgba(255,255,255,.06); }
+.sc-hd .sc-list > :is(li.is-selected, li[aria-selected="true"], .sc-list-item.is-selected) {
+  box-shadow: inset 2px 0 0 var(--sc-accent-hi), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.5);
+}
+.sc-hd :is(.sc-scroll, .sc-list, .sc-textarea)::-webkit-scrollbar { width: 12px; height: 12px; }
+.sc-hd :is(.sc-scroll, .sc-list, .sc-textarea)::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--sc-frame-hi), var(--sc-scroll-thumb) 30% 70%, var(--sc-frame-lo));
+}
+.sc-hd .sc-tab { padding: 5px 14px 6px; font-weight: 500; transition: color var(--_hd-ease); }
+.sc-hd .sc-tab:is(.is-active, [aria-selected="true"]) {
+  padding-bottom: 8px;
+  box-shadow: inset 0 2px 0 var(--sc-accent), inset 1px 0 0 var(--sc-frame-hi), inset -1px 0 0 var(--sc-frame-lo), 0 -4px 10px -4px var(--sc-glow);
+}
+.sc-hd :is(.sc-tooltip, [data-sc-tip]:hover::after) {
+  padding: 5px 9px 6px;
+  font-family: var(--sc-font);
+  line-height: 1.35;
+  box-shadow: 0 0 0 1px #000, 0 6px 16px rgba(0,0,0,.65);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.sc-hd .sc-tooltip-cost { margin-top: 3px; }
+
+/* --- Command card, screens, vitals ------------------------------------ */
+.sc-hd .sc-cmd-btn {
+  --_hd-out: 0 1px 3px rgba(0,0,0,.75);
+  transition: color var(--_hd-ease), box-shadow var(--_hd-ease);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi), inset -1px -1px 0 var(--sc-frame-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--sc-frame-hi) 35%, transparent),
+    inset -2px -2px 0 color-mix(in srgb, var(--sc-frame-lo) 70%, transparent),
+    inset 0 0 0 3px var(--sc-frame-mid), inset 0 0 0 4px rgba(0,0,0,.55),
+    var(--_hd-out);
+}
+.sc-hd .sc-cmd-btn > .sc-glyph { width: 26px; height: 26px; }
+.sc-hd .sc-cmd-btn:is(:hover, .is-hover) { --_hd-out: 0 1px 3px rgba(0,0,0,.75), 0 0 0 1px var(--sc-accent), 0 0 12px var(--sc-glow); }
+.sc-hd .sc-cmd-btn:is(:active, .is-active) {
+  box-shadow: inset 1px 1px 0 var(--sc-frame-lo), inset -1px -1px 0 var(--sc-frame-hi), inset 0 0 0 3px var(--sc-frame-lo), inset 0 3px 8px rgba(0,0,0,.7);
+}
+.sc-hd .sc-cmd-btn.is-selected {
+  box-shadow: inset 1px 1px 0 var(--sc-frame-lo), inset -1px -1px 0 var(--sc-frame-hi), inset 0 0 0 2px var(--sc-c-green), inset 0 0 10px rgba(60,240,76,.45), 0 0 8px rgba(60,240,76,.35);
+}
+.sc-hd .sc-cmd-btn:is(:disabled, .is-disabled) { --_hd-out: 0 1px 3px rgba(0,0,0,.75); }
+.sc-hd .sc-cmd-btn:is(:disabled, .is-disabled) > * { filter: none; }
+.sc-hd .sc-info { background-image: radial-gradient(ellipse at 50% 30%, var(--_hd-screen, #0b0f14), #000 75%); }
+.sc-hd .sc-sel { transition: border-color var(--_hd-ease), box-shadow var(--_hd-ease); }
+.sc-hd .sc-sel:hover { box-shadow: 0 0 6px var(--sc-glow); }
+.sc-hd .sc-bar { height: 6px; }
+.sc-hd .sc-bar-lg { height: 9px; }
+.sc-hd .sc-progress { height: 12px; }
+.sc-hd .sc-progress::before { background: linear-gradient(var(--sc-progress-hi), var(--sc-progress) 55%, color-mix(in srgb, var(--sc-progress) 60%, #000)); box-shadow: 0 0 6px color-mix(in srgb, var(--sc-progress) 50%, transparent); }
+.sc-hd .sc-timer { padding: 2px 8px; box-shadow: 0 0 0 1px #000, 0 2px 6px rgba(0,0,0,.6); }
+.sc-hd .sc-table td { padding: 4px 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-hd *, .sc-hd *::before, .sc-hd *::after { transition: none !important; }
+}
+/* ==========================================================================
+   STARCRAFT UI — modern terran refinements  (scope: .sc-hd.sc-terran / .sc-hd .sc-terran)
+   ========================================================================== */
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) {
+  --sc-glow: rgba(60,220,150,.42);
+  --sc-btn-bg: linear-gradient(#59616a, #40464e 22%, #2e3339 48%, #23272c 52%, #1b1e22 80%, #15171a);
+  --sc-btn-bg-hover: linear-gradient(#6a737d, #4c535b 22%, #373d44 48%, #2b3036 52%, #212428 80%, #1a1c20);
+  --sc-btn-bg-active: linear-gradient(#0e1013, #171a1d 40%, #22262a 80%, #2a2e33);
+  --sc-cmd-bg: linear-gradient(#6b747d, #565d65 30%, #464d54 55%, #383e44 85%, #30353a);
+  --sc-cmd-bg-hover: linear-gradient(#7a838c, #626a72 30%, #50575e 55%, #41474d 85%, #383d42);
+  --sc-console-bg: linear-gradient(#66707a, #545c64 12%, #474e56 30%, #3b4148 60%, #2e3338 85%, #24282c);
+  --sc-select-bg: linear-gradient(#245464, #1a3e4c);
+  /* HD bolt plate: same 1998 plate, drawn smooth with a round screw head */
+  --_tr-bolt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath fill='%2307080a' d='M0 0h11v11H0z'/%3E%3Cpath fill='%23808890' d='M1 1h9v9H1z'/%3E%3Cpath fill='%23d8e0e8' d='M1 1h9v1H2v8H1z'/%3E%3Cpath fill='%23353a40' d='M2 10h8V2H9v7H2z'/%3E%3Ccircle cx='5.5' cy='5.5' r='2.7' fill='%2320252a'/%3E%3Ccircle cx='5.3' cy='5.3' r='2' fill='%23a8b0b8'/%3E%3Cpath stroke='%23353a40' stroke-width='.9' d='M3.9 6.7l2.8-2.8'/%3E%3C/svg%3E");
+  --_tr-hazard: repeating-linear-gradient(-45deg, #b49424 0 3px, #8a6e14 3px 4px, #141517 4px 7px, #141517 7px 8px);
+  --_hd-screen: #0a1014;
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) :is(.sc-panel, .sc-dialog, .sc-frame)::before {
+  inset: -3px;
+  background-size: 11px 11px;
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-dialog::after {
+  inset: -4px 0;
+  background-size: 48px 8px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.6));
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-dialog-title { padding-bottom: 9px; }
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-console::after {
+  background-size: 11px 11px, 11px 11px, 11px 11px, 11px 11px, 100% 3px, 100% 4px;
+  background-position: 4px 6px, calc(var(--_l) - 15px) 6px, calc(100% - var(--_r) + 4px) 6px, right 4px top 6px, left bottom, left bottom;
+}
+/* ==========================================================================
+   STARCRAFT UI — modern zerg refinements  (scope: .sc-hd.sc-zerg / .sc-hd .sc-zerg)
+   ========================================================================== */
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) {
+  --sc-glow: rgba(244,110,24,.48);
+  --sc-btn-bg: linear-gradient(#6a3220, #4e2214 22%, #3a160e 48%, #2c0e0e 56%, #200809 82%, #170506);
+  --sc-btn-bg-hover: linear-gradient(#84422a, #622c1a 22%, #481c12 48%, #361210 56%, #260a0a 82%, #1c0607);
+  --sc-btn-bg-active: linear-gradient(#100303, #1a0707 40%, #2a0e0b 80%, #34140f);
+  --sc-console-bg: linear-gradient(#5e2a1a, #4c1e12 15%, #3c140d 40%, #2c0e0c 68%, #1e0707 90%, #160404);
+  --sc-select-bg: linear-gradient(#5e2040, #44142c);
+  --sc-tooltip-bg: rgba(16,4,6,.88);
+  --sc-tooltip-border: var(--sc-frame);
+  --_hd-screen: #170708;
+}
+/* Claws: 16px pixel art redrawn 1.5x so they hold their own next to the larger type */
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) :is(.sc-dialog, .sc-panel, .sc-frame)::before,
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) :is(.sc-dialog, .sc-panel, .sc-frame)::after {
+  inset: -10px;
+  background-size: 24px 24px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.55));
+}
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) .sc-console::before { filter: drop-shadow(0 -1px 2px rgba(0,0,0,.5)); }
+/* ==========================================================================
+   STARCRAFT UI — modern protoss refinements  (scope: .sc-hd.sc-protoss / .sc-hd .sc-protoss)
+   ========================================================================== */
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) {
+  --sc-glow: rgba(64,196,248,.5);
+  --sc-btn-bg: linear-gradient(#1e4c5a, #163d4a 20%, #0f2f3a 48%, #0b2630 56%, #071d25 85%, #05171e);
+  --sc-btn-bg-hover: linear-gradient(#2a6476, #1e5060 20%, #153e4c 48%, #10323e 56%, #0b2630 85%, #081e26);
+  --sc-btn-bg-active: linear-gradient(#03121a, #062028 40%, #0c2e3a 80%, #123846);
+  --sc-console-bg: linear-gradient(#2e393e, #263136 18%, #1e292e 45%, #152024 72%, #0e171b 92%, #0a1216);
+  --sc-select-bg: linear-gradient(#16708e, #0e5470 55%, #0a4058);
+  --sc-tooltip-border: var(--sc-frame-mid);
+  --_hd-screen: #04161e;
+  --_gem: radial-gradient(closest-side at 45% 42%, #fff 12%, #a8ecfc 26%, #48ccf8 40% 56%, #1048a0 68% 76%, #fce890 80% 87%, #5c3c10 93%, #0000);
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-dialog::after {
+  inset: -7px;
+  background-size: 18px 13px, 26px 16px, 14px 14px, 14px 14px, 14px 14px, 14px 14px;
+  filter: drop-shadow(0 0 3px rgba(56,192,248,.45));
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) :is(.sc-panel, .sc-frame)::after {
+  inset: -5px;
+  background-size: 12px 12px;
+  filter: drop-shadow(0 0 2px rgba(56,192,248,.4));
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-dialog::before { filter: drop-shadow(0 -1px 0 #140c00) drop-shadow(0 -2px 4px rgba(252,224,100,.18)); }
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-console::after { filter: drop-shadow(0 0 3px rgba(56,192,248,.5)); }
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) :is(.sc-dialog-title, h1, .sc-h1) { text-shadow: 0 1px 0 #000, 0 0 12px rgba(252,224,100,.28); }
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II era layer  (scope: .sc2)
+   Usage: <div class="sc sc2 sc2-terran">  (sc2-terran | sc2-zerg | sc2-protoss)
+   Shared by all three SC2 races: smooth rendering, SC2 type, SC2 palette,
+   5×3 command card and the SC2 console arrangement. Race files add the look.
+   ========================================================================== */
+.sc2 {
+  /* --- rendering: anti-aliased, high-res --- */
+  -webkit-font-smoothing: antialiased;
+  font-smooth: auto;
+  image-rendering: auto;
+  text-rendering: optimizeLegibility;
+
+  --sc-font: "Exo 2", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --sc-font-title: "Michroma", "Exo 2", "Segoe UI", sans-serif;
+  --sc-font-size: 14px;
+  --sc-line: 1.35;
+
+  /* --- SC2 text palette --- */
+  --sc-c-pale: #c6d6e8;     /* default UI text: cool light blue-grey */
+  --sc-c-yellow: #ffc81e;   /* hotkeys, highlights */
+  --sc-c-white: #ffffff;
+  --sc-c-grey: #7d8790;
+  --sc-c-red: #ff3c32;
+  --sc-c-green: #5ae641;
+  --sc-c-orange: #ff8c1e;
+  --sc-c-blue: #3aa0ff;
+
+  /* --- SC2 player colours --- */
+  --sc-p1: #b4141e;  /* red        */
+  --sc-p2: #0042ff;  /* blue       */
+  --sc-p3: #1ca7ea;  /* teal       */
+  --sc-p4: #540081;  /* purple     */
+  --sc-p5: #ebe129;  /* yellow     */
+  --sc-p6: #fe8a0e;  /* orange     */
+  --sc-p7: #168000;  /* green      */
+  --sc-p8: #cca6fc;  /* light pink */
+
+  /* --- vitals --- */
+  --sc-hp-high: #3cd22a;
+  --sc-hp-mid: #e6c81e;
+  --sc-hp-low: #dc2a1e;
+  --sc-shield: #4ab4ff;
+  --sc-energy: #c85aff;
+
+  --sc-text: var(--sc-c-pale);
+  --sc-text-dim: #7c8ea2;
+  --sc-label-disabled: #6a737c;
+  --sc-field-text: #ffffff;
+  --sc-progress: #2c9cff;
+  --sc-progress-hi: #9cd8ff;
+
+  --sc-tooltip-bg: rgba(4, 10, 18, .94);
+  --sc-cmd-size: 44px;
+  --sc-cmd-cols: 5;
+}
+
+.sc2 img,
+.sc2 canvas,
+.sc2 svg { image-rendering: auto; }
+
+/* Hover/press feedback is animated in SC2 */
+.sc2 .sc-btn,
+.sc2 .sc-cmd-btn,
+.sc2 .sc-tab,
+.sc2 .sc-glue,
+.sc2 .sc-list > li {
+  transition: color .12s, background-color .12s, box-shadow .12s, filter .12s, text-shadow .12s;
+}
+
+/* Headings and dialog titles: wide, spaced, upper-case */
+.sc2 h1, .sc2 h2, .sc2 h3,
+.sc2 .sc-h1, .sc2 .sc-h2, .sc2 .sc-h3,
+.sc2 .sc-dialog-title {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: normal;
+}
+.sc2 h1, .sc2 .sc-h1 { font-size: 1.7em; }
+.sc2 h2, .sc2 .sc-h2 { font-size: 1.2em; }
+.sc2 h3, .sc2 .sc-h3 { font-size: .95em; }
+.sc2 .sc-dialog-title { font-size: .95em; }
+
+/* Buttons: bold caps captions */
+.sc2 .sc-btn {
+  height: 32px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: .9em;
+}
+.sc2 .sc-btn-sm { height: 24px; line-height: 22px; font-size: .78em; }
+.sc2 .sc-btn-lg { height: 40px; line-height: 38px; font-size: 1em; }
+.sc2 .sc-btn:active,
+.sc2 .sc-btn.is-active { padding-top: 1px; padding-left: calc(var(--sc-btn-px) + 1px); padding-right: calc(var(--sc-btn-px) - 1px); }
+
+/* Glue menu: SC2 main-menu style caps */
+.sc2 .sc-glue {
+  font-family: var(--sc-font);
+  font-weight: 700;
+  font-size: 1.45em;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.sc2 .sc-glue small { text-transform: none; letter-spacing: .02em; font-weight: 400; font-size: .48em; }
+
+/* Form fields: taller, anti-aliased */
+.sc2 .sc-input,
+.sc2 .sc-select { height: 28px; padding: 3px 8px; }
+.sc2 .sc-select { padding-right: 24px; }
+.sc2 .sc-check > input { width: 15px; height: 15px; }
+
+/* Resources: white numbers, icons slightly larger */
+.sc2 .sc-resources {
+  gap: 18px;
+  color: var(--sc-c-white);
+  font-weight: 600;
+  text-shadow: 0 1px 2px #000, 0 0 4px rgba(0, 0, 0, .8);
+}
+.sc2 .sc-res::before { width: 18px; height: 18px; }
+.sc2 .sc-res.is-short { color: var(--sc-c-red); }
+.sc2 .sc-ico { width: 16px; height: 16px; vertical-align: -3px; }
+
+/* Stats: SC2 shows "45 / 45" in white with coloured bars */
+.sc2 .sc-stat { font-weight: 600; }
+
+/* Bars: thin black separators, glossy */
+.sc2 .sc-bar { height: 6px; --seg: 5px; border-radius: 1px; }
+.sc2 .sc-bar::before {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(var(--seg) - 1px), rgba(0,0,0,.75) 0 var(--seg)),
+    linear-gradient(rgba(255,255,255,.45), rgba(255,255,255,0) 50%, rgba(0,0,0,.3)),
+    var(--_fill);
+}
+.sc2 .sc-bar-lg { height: 9px; --seg: 7px; }
+
+.sc2 .sc-progress { height: 12px; }
+
+/* Tooltip: SC2's dark translucent card with gold hotkey */
+.sc2 .sc-tooltip,
+.sc2 [data-sc-tip]:hover::after {
+  padding: 6px 10px 7px;
+  color: var(--sc-c-pale);
+  box-shadow: 0 0 0 1px #000, 0 4px 14px rgba(0, 0, 0, .6);
+}
+.sc2 .sc-tooltip .sc-hk { font-weight: 700; }
+.sc2 .sc-tooltip-cost { gap: 14px; margin-top: 4px; font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Console: SC2 arrangement  minimap | portrait | info | command card (5×3)
+   -------------------------------------------------------------------------- */
+.sc2 .sc-console {
+  grid-template-columns: 150px 96px minmax(0, 1fr) auto;
+  grid-template-areas: "map portrait info cmd";
+  align-items: end;
+  gap: 12px;
+  padding: 26px 12px 10px;
+  isolation: isolate;   /* console ornaments stay behind the screens */
+}
+.sc2 .sc-console::before,
+.sc2 .sc-console::after { z-index: -1; }
+.sc2 .sc-minimap { width: 150px; height: 150px; }
+.sc2 .sc-portrait { width: 96px; height: 110px; align-self: end; }
+.sc2 .sc-info { min-height: 130px; padding: 10px 14px; }
+.sc2 .sc-cmd { gap: 4px; padding: 6px; }
+.sc2 .sc-cmd-btn > .sc-glyph { width: 28px; height: 28px; }
+.sc2 .sc-cmd-btn > img { width: 100%; height: 100%; }
+.sc2 .sc-unit { grid-template-columns: 80px 1fr; }
+.sc2 .sc-unit-wire { width: 80px; height: 80px; }
+.sc2 .sc-unit-name { font-weight: 600; letter-spacing: .03em; }
+.sc2 .sc-selection { grid-template-columns: repeat(8, 38px); grid-template-rows: repeat(3, 38px); grid-auto-rows: 38px; }
+
+/* Portrait static → SC2 holographic flicker */
+.sc2 .sc-portrait.is-static::after {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.55) 0 1px, transparent 1px 3px),
+    linear-gradient(rgba(120, 200, 255, .25), rgba(120, 200, 255, .05));
+}
+
+@media (max-width: 760px) {
+  .sc2 .sc-console {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "info info" "map cmd";
+  }
+  .sc2 .sc-portrait { display: none; }
+}
+@media (max-width: 560px) {
+  .sc2 { --sc-cmd-size: 34px; }
+  .sc2 .sc-console { gap: 8px; padding-left: 8px; padding-right: 8px; }
+  .sc2 .sc-cmd { gap: 3px; padding: 4px; }
+  .sc2 .sc-cmd-btn > .sc-glyph { width: 22px; height: 22px; }
+  .sc2 .sc-minimap { width: 100px; height: 100px; }
+}
+
+/* Messages: SC2 chat */
+.sc2 .sc-messages { gap: 2px; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+.sc2 .sc-msg.is-system { color: var(--sc-c-yellow); }
+.sc2 .sc-notice { font-size: 1.15em; color: #ffd84a; text-shadow: 0 1px 2px #000, 0 0 6px #000; }
+
+/* Cursor: SC2 uses a larger, smooth arrow; keep the colour semantics */
+.sc2 .sc-select-ring { border-width: 2px; }
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II terran skin  (scope: .sc2-terran)
+   Blue-grey gunmetal plating, 45° chamfers, recessed dark-glass screens,
+   thin cyan LED rims. Menus are blue-cyan (not SC1 yellow).
+   ========================================================================== */
+.sc2-terran {
+  --sc-panel-bg: rgba(4, 10, 18, .9);
+  --sc-panel-bg-solid: #050b13;
+  --sc-frame-hi: #9fb2c6;
+  --sc-frame: #4f5f70;
+  --sc-frame-mid: #2f3b48;
+  --sc-frame-lo: #1a222c;
+  --sc-frame-dark: #04070b;
+
+  --sc-accent: #3aa8ff;
+  --sc-accent-hi: #a8e4ff;
+  --sc-glow: rgba(60, 170, 255, .6);
+  --sc-glue: #8fd0ff;
+  --sc-glue-hover: #f0faff;
+
+  --sc-title: #bfe4ff;
+  --sc-label: #d4ecff;
+  --sc-label-hover: #fff;
+  --sc-text-dim: #7c90a6;
+
+  --sc-btn-bg: linear-gradient(#22405e, #142a40 50%, #0c1b2c 51%, #0a1624);
+  --sc-btn-bg-hover: linear-gradient(#2e5680, #1b3a5a 50%, #112a44 51%, #0e2236);
+  --sc-btn-bg-active: linear-gradient(#060d16, #0b1724 60%, #10223a);
+
+  --sc-field-bg: #03070c;
+  --sc-select-bg: linear-gradient(90deg, rgba(44, 140, 235, .7), rgba(30, 90, 170, .35));
+
+  --sc-icon: #c4e2ff;
+  --sc-icon-hover: #fff;
+  --sc-icon-disabled: #46505a;
+  --sc-cmd-bg: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 45%), radial-gradient(circle at 50% 40%, #1f3850, #0b1520 75%);
+  --sc-cmd-bg-hover: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,0) 45%), radial-gradient(circle at 50% 40%, #2b5072, #0f1e2e 75%);
+  --sc-cmd-bg-active: radial-gradient(circle at 50% 55%, #10202f, #04080d 80%);
+
+  --sc-scroll-track: #04070b;
+  --sc-scroll-thumb: #45596e;
+  --sc-tooltip-border: #3a7cb4;
+
+  --sc-title-rule:
+    linear-gradient(90deg, transparent, #5cc0ff 20% 80%, transparent) left bottom / 100% 1px no-repeat,
+    linear-gradient(rgba(40, 110, 190, 0), rgba(40, 110, 190, .28)) left bottom / 100% 100% no-repeat;
+  --sc-screen-shadow: 0 0 0 1px #0b1118, 0 0 0 3px #4f5f70, 0 0 0 4px #1a222c, 0 0 0 5px #04070b,
+    0 0 6px 5px rgba(60, 160, 255, .2), inset 0 0 14px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(140, 200, 255, .25);
+
+  --sc-console-rim: 18px;
+  --sc-console-edge: linear-gradient(#04070b 0 1px, #8fa2b6 1px 2px, rgba(80, 185, 255, .75) 3px 4px, transparent 4px);
+  --sc-console-bg: linear-gradient(#4b5866, #333f4c 30%, #252e38 70%, #171d24);
+  --sc-console-texture:
+    linear-gradient(transparent 24px, rgba(0,0,0,.4) 24px 25px, rgba(255,255,255,.07) 25px 26px, transparent 26px),
+    repeating-linear-gradient(90deg, transparent 0 239px, rgba(0,0,0,.4) 239px 240px, rgba(255,255,255,.07) 240px 241px, transparent 241px 480px),
+    repeating-linear-gradient(rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%231a52b8' d='M3 29l2-12 5-4 2 16z'/%3E%3Cpath fill='%2368b4ff' d='M10 13l2 16H7z'/%3E%3Cpath fill='%231f5fd0' d='M20 29l4-13 5 3v10z'/%3E%3Cpath fill='%2380c8ff' d='M24 16l5 3-2 10z'/%3E%3Cpath fill='%232f7ae8' d='M16 2l-6 10 2 17h4z'/%3E%3Cpath fill='%239ad8ff' d='M16 2l6 10-2 17h-4z'/%3E%3Cpath fill='%23e8f8ff' fill-opacity='.7' d='M16 2l-3 10 3 15z'/%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='11' y='1' width='10' height='5' rx='1.5' fill='%23b8c2cc'/%3E%3Crect x='7' y='5' width='18' height='24' rx='3' fill='%230e3a12'/%3E%3Crect x='10' y='8' width='12' height='18' rx='2' fill='%2340d83a'/%3E%3Crect x='12' y='9' width='3' height='16' rx='1.5' fill='%23c4ffb4'/%3E%3Cpath fill='%23707e8c' d='M7 13h18v2H7zM7 20h18v2H7z'/%3E%3Crect x='8' y='27' width='16' height='4' rx='1' fill='%238a96a2'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23687786' d='M2 23l5-9h18l5 9v6H2z'/%3E%3Cpath fill='%23aebbc8' d='M7 14l3-7h12l3 7z'/%3E%3Cpath fill='%23dbe4ec' d='M10 7h12l-1 2H11z'/%3E%3Cpath fill='%23363f4a' d='M2 25h28v4H2z'/%3E%3Cpath fill='%235aff4a' d='M9 18h5v3H9zM18 18h5v3h-5z'/%3E%3C/svg%3E");
+}
+
+/* --- Panels / dialogs: chamfered glass with a steel frame + cyan inner rim --- */
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame) {
+  --_c1: 14px;
+  --_c2: 6px;
+  border-color: transparent;
+  box-shadow: inset 0 0 40px rgba(30, 110, 200, .14);
+  clip-path: polygon(var(--_c1) 0, calc(100% - var(--_c2)) 0, 100% var(--_c2), 100% calc(100% - var(--_c1)),
+    calc(100% - var(--_c1)) 100%, var(--_c2) 100%, 0 calc(100% - var(--_c2)), 0 var(--_c1));
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::before,
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::after {
+  content: "";
+  /* ring = chamfered outline (cuts --_k1/--_k2) minus itself inset by --_w */
+  --_a: calc(var(--_k1) + var(--_w) * .41);
+  --_b: calc(var(--_k2) + var(--_w) * .41);
+  --_x: calc(100% - var(--_w));
+  clip-path: polygon(evenodd,
+    var(--_k1) 0, calc(100% - var(--_k2)) 0, 100% var(--_k2), 100% calc(100% - var(--_k1)),
+    calc(100% - var(--_k1)) 100%, var(--_k2) 100%, 0 calc(100% - var(--_k2)), 0 var(--_k1), var(--_k1) 0,
+    var(--_a) var(--_w), calc(100% - var(--_b)) var(--_w), var(--_x) var(--_b), var(--_x) calc(100% - var(--_a)),
+    calc(100% - var(--_a)) var(--_x), var(--_b) var(--_x), var(--_w) calc(100% - var(--_b)), var(--_w) var(--_a), var(--_a) var(--_w));
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::before {
+  inset: -2px;
+  --_k1: var(--_c1); --_k2: var(--_c2); --_w: 5px;
+  background:
+    linear-gradient(90deg, transparent 32%, #6cc8ff 32% 68%, transparent 68%) top / 100% 2px no-repeat,
+    linear-gradient(#93a6ba, #4f5f70 30%, #2c3744 70%, #3d4a58);
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::after {
+  inset: 4px;
+  --_k1: calc(var(--_c1) - 3.5px); --_k2: calc(var(--_c2) - 3.5px); --_w: 1px;
+  background: rgba(100, 195, 255, .8);
+}
+
+.sc2-terran :is(h1, h2, .sc-h1, .sc-h2, .sc-dialog-title) { text-shadow: 0 0 8px rgba(60, 160, 255, .55), 0 1px 1px #000; }
+
+/* --- Buttons: steel-blue bars, chamfered ends, glow drawn inside --- */
+.sc2-terran .sc-btn {
+  border-color: transparent;
+  text-shadow: 0 0 6px rgba(80, 180, 255, .5), 0 1px 1px #000;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: inset 0 0 0 1px rgba(100, 180, 240, .6), inset 0 0 0 2px rgba(0, 0, 0, .6),
+    inset 0 0 10px rgba(50, 150, 255, .22), inset 0 1px 0 2px rgba(160, 210, 255, .1);
+}
+.sc2-terran .sc-btn::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 4.7px, rgba(120, 200, 255, .8) 4.7px 6.2px, transparent 6.2px) left top / 10px 10px no-repeat,
+    linear-gradient(-45deg, transparent 4.7px, rgba(120, 200, 255, .8) 4.7px 6.2px, transparent 6.2px) right bottom / 10px 10px no-repeat;
+}
+.sc2-terran .sc-btn:is(:hover, .is-hover, :focus-visible) {
+  text-shadow: 0 0 8px rgba(120, 210, 255, .9), 0 1px 1px #000;
+  box-shadow: inset 0 0 0 1px rgba(150, 220, 255, .95), inset 0 0 0 2px rgba(0, 0, 0, .5),
+    inset 0 0 14px rgba(70, 175, 255, .5), inset 0 1px 0 2px rgba(180, 225, 255, .15);
+}
+.sc2-terran .sc-btn:is(:active, .is-active) {
+  color: #bfe0ff;
+  box-shadow: inset 0 0 0 1px rgba(80, 150, 210, .6), inset 0 3px 8px rgba(0, 0, 0, .85);
+}
+.sc2-terran .sc-btn:is(:disabled, .is-disabled) {
+  background: linear-gradient(#272c32, #1a1e22 50%, #131619);
+  text-shadow: 0 1px 1px #000;
+  box-shadow: inset 0 0 0 1px #3a4148, inset 0 0 0 2px rgba(0, 0, 0, .6);
+}
+.sc2-terran .sc-btn:is(:disabled, .is-disabled)::before { opacity: .3; filter: grayscale(1); }
+
+.sc2-terran .sc-glue:hover,
+.sc2-terran .sc-glue.is-hover { text-shadow: 0 0 6px var(--sc-glow), 0 0 16px var(--sc-glow), 0 2px 2px #000; }
+
+/* --- Command card: steel bevel, glassy highlight; selected = green-white --- */
+.sc2-terran .sc-cmd-btn {
+  border-color: #04070b;
+  box-shadow: inset 1px 1px 0 #9fb2c6, inset -1px -1px 0 #1a222c, inset 0 0 0 2px #3c4a5a, inset 0 0 0 3px #04070b;
+}
+.sc2-terran .sc-cmd-btn:is(:hover, .is-hover) {
+  box-shadow: inset 0 0 0 1px #c8ecff, inset 0 0 0 2px #4aa8f0, inset 0 0 0 3px #04070b, inset 0 0 12px rgba(80, 180, 255, .55);
+}
+.sc2-terran .sc-cmd-btn:is(:active, .is-active) {
+  box-shadow: inset 1px 1px 0 #1a222c, inset -1px -1px 0 #6f8296, inset 0 0 0 2px #253040, inset 0 3px 8px #000;
+}
+.sc2-terran .sc-cmd-btn.is-selected {
+  color: #eaffe4;
+  box-shadow: inset 0 0 0 1px #eaffe0, inset 0 0 0 2px #6ef05a, inset 0 0 0 3px #04070b, inset 0 0 14px rgba(110, 240, 90, .55);
+}
+.sc2-terran .sc-cmd-btn.is-selected > * { filter: drop-shadow(0 0 3px rgba(140, 255, 120, .8)); }
+.sc2-terran .sc-cmd-btn:is(:disabled, .is-disabled) { background: radial-gradient(#1c2128, #0c0f13 80%); }
+
+/* --- Lists & tabs --- */
+.sc2-terran .sc-list > :is(li.is-selected, li[aria-selected="true"], .sc-list-item.is-selected) {
+  box-shadow: inset 2px 0 0 #a8e4ff, inset 0 1px 0 rgba(150, 210, 255, .45), inset 0 -1px 0 rgba(150, 210, 255, .25);
+}
+.sc2-terran .sc-tabs { border-bottom-color: #1a222c; box-shadow: 0 1px 0 #3a7cb4; }
+.sc2-terran .sc-tab {
+  padding: 4px 18px 5px;
+  border: 0;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
+  background: linear-gradient(#26313c, #141a21);
+  box-shadow: inset 0 1px 0 #4f5f70;
+}
+.sc2-terran .sc-tab:hover { color: #d4ecff; }
+.sc2-terran .sc-tab:is(.is-active, [aria-selected="true"]) {
+  color: #fff;
+  background: linear-gradient(#2f6aa6, #163a60 60%, #0e2a48);
+  box-shadow: inset 0 2px 0 #7ccfff, inset 0 0 12px rgba(80, 180, 255, .4);
+  text-shadow: 0 0 6px rgba(120, 210, 255, .8);
+}
+
+/* --- Console: raised housings over minimap + command card, low centre --- */
+.sc2-terran .sc-console {
+  --_l: min(178px, 30%);
+  --_r: min(270px, 40%);
+  isolation: isolate;
+}
+.sc2-terran .sc-console::before,
+.sc2-terran .sc-console::after { content: ""; z-index: -1; }
+.sc2-terran .sc-console::before {
+  inset: 0 0 auto;
+  height: 30px;
+  clip-path: polygon(0 10px, 10px 0, var(--_l) 0, calc(var(--_l) + 18px) 18px, calc(100% - var(--_r) - 18px) 18px,
+    calc(100% - var(--_r)) 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1.5px), #9cb0c4 0 50%, transparent 0) var(--_l) 0 / 18px 18px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1.5px), #9cb0c4 0 50%, transparent 0) calc(100% - var(--_r) - 18px) 0 / 18px 18px no-repeat,
+    linear-gradient(transparent 5px, #5cc0ff 5px 6px, transparent 6px) 24px 0 / calc(var(--_l) - 44px) 100% no-repeat,
+    linear-gradient(transparent 5px, #5cc0ff 5px 6px, transparent 6px) right 24px top 0 / calc(var(--_r) - 44px) 100% no-repeat,
+    linear-gradient(#9cb0c4 0 1px, #637282 1px, #4b5866 18px, transparent 18px);
+}
+.sc2-terran .sc-console::after {
+  inset: 0;
+  --_bolt: radial-gradient(circle, #d2dde8 0 1px, #56677a 1.5px 2px, #0a0e13 2.5px 3px, transparent 3.5px);
+  background:
+    var(--_bolt) 10px 6px / 8px 8px no-repeat,
+    var(--_bolt) calc(var(--_l) - 18px) 6px / 8px 8px no-repeat,
+    var(--_bolt) calc(100% - var(--_r) + 10px) 6px / 8px 8px no-repeat,
+    var(--_bolt) right 10px top 6px / 8px 8px no-repeat,
+    linear-gradient(transparent calc(100% - 5px), #04070b 0 calc(100% - 4px), rgba(80, 185, 255, .7) 0 calc(100% - 3px), #0d1218 0);
+}
+
+/* Recessed dark-glass screens */
+.sc2-terran :is(.sc-info, .sc-portrait) {
+  background: linear-gradient(165deg, rgba(120, 190, 255, .1), rgba(120, 190, 255, 0) 40%), #02060b;
+}
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II zerg skin  (scope: .sc2-zerg)
+   Living carapace: violet-maroon chitin, glossy plates, bone spines,
+   wet dark screen recesses, amber / sickly-green bioluminescence.
+   ========================================================================== */
+.sc2-zerg {
+  --sc-panel-bg: rgba(18, 6, 20, .9);
+  --sc-panel-bg-solid: #13061a;
+  --sc-frame-hi: #b77aa4;
+  --sc-frame: #5c2450;
+  --sc-frame-mid: #3a1432;
+  --sc-frame-lo: #22091e;
+  --sc-frame-dark: #0a0208;
+
+  --sc-accent: #ff8a1e;
+  --sc-accent-hi: #ffc45a;
+  --sc-glow: rgba(255, 118, 20, .65);
+  --sc-glue: #ff9a2a;
+  --sc-glue-hover: #ffd77a;
+
+  --sc-text: #dccbd8;
+  --sc-text-dim: #9a7c94;
+  --sc-title: #ffa53a;
+  --sc-label: #ffe9d2;
+  --sc-label-hover: #ffffff;
+  --sc-label-disabled: #74606c;
+  --sc-select-bg: linear-gradient(90deg, #6a1c42, #3a0c28 70%, rgba(40, 8, 30, .6));
+  --sc-select-text: #fff;
+  --sc-field-bg: #0c0410;
+
+  --sc-btn-bg: linear-gradient(#56204a, #36102e 48%, #22081c 52%, #160412);
+  --sc-btn-bg-hover: linear-gradient(#6e2a5a, #461638 48%, #2c0c22 52%, #1c0616);
+  --sc-btn-bg-active: linear-gradient(#0e020c, #1e0818 60%, #2c0c24);
+  --sc-cmd-bg: radial-gradient(circle at 50% 35%, #3e1636, #170512 75%);
+  --sc-cmd-bg-hover: radial-gradient(circle at 50% 35%, #5a2048, #22081c 75%);
+  --sc-cmd-bg-active: radial-gradient(circle at 50% 60%, #22081c, #0a0208 80%);
+
+  --sc-icon: #ffb44a;
+  --sc-icon-hover: #ffe6a0;
+  --sc-icon-disabled: #4e3446;
+  --sc-scroll-track: #0c0410;
+  --sc-scroll-thumb: #5c2450;
+  --sc-tooltip-bg: rgba(16, 4, 16, .95);
+  --sc-tooltip-border: #7a3462;
+  --sc-title-rule:
+    radial-gradient(closest-side, rgba(255, 140, 30, .9), rgba(255, 140, 30, 0)) center bottom / 100% 2px no-repeat;
+
+  /* Console: deep violet-brown chitin; rim holds the hump silhouette */
+  --sc-console-rim: 46px;
+  --sc-console-edge: linear-gradient(#0a0208 0 1px, rgba(220, 140, 200, .45) 1px 2px, transparent 3px);
+  --sc-console-bg: linear-gradient(#41163a, #2c0c28 30%, #1c0618 70%, #0e030c);
+  --sc-console-texture:
+    radial-gradient(ellipse 22% 5px at 50% 1px, rgba(255, 140, 30, .5), transparent),
+    repeating-linear-gradient(97deg, rgba(0, 0, 0, .16) 0 2px, transparent 2px 11px, rgba(150, 60, 120, .08) 11px 12px, transparent 12px 23px);
+  --sc-screen-shadow: inset 0 0 14px #000, inset 0 0 0 1px rgba(255, 130, 40, .18), 0 0 0 2px #0a0208,
+    0 0 0 4px #3e1636, 0 -1px 0 4px #9a5888, 0 0 0 6px #0a0208, 0 0 10px 6px rgba(0, 0, 0, .55);
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23081838' stroke-width='.8' stroke-linejoin='round'%3E%3Cpath fill='%231e56c8' d='M3 29l4-14v14z'/%3E%3Cpath fill='%237cc8ff' d='M7 15l4 14H7z'/%3E%3Cpath fill='%231e56c8' d='M21 29l4-18v18z'/%3E%3Cpath fill='%237cc8ff' d='M25 11l4 18h-4z'/%3E%3Cpath fill='%232a6ae0' d='M10 29l6-26v26z'/%3E%3Cpath fill='%23b8e6ff' d='M16 3l6 26h-6z'/%3E%3C/g%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3CradialGradient id='g' cx='.4' cy='.4'%3E%3Cstop stop-color='%23e4ff80'/%3E%3Cstop offset='1' stop-color='%23287a0e'/%3E%3C/radialGradient%3E%3Cpath fill='%235a1e46' stroke='%23140410' d='M4 20c2 9 22 9 24 0l-2 10H6z'/%3E%3Cpath fill='url(%23g)' stroke='%230e2604' d='M16 2c3 5 10 9 10 16a10 9 0 0 1-20 0c0-7 7-11 10-16z'/%3E%3Cellipse cx='12.5' cy='13' rx='2' ry='3.5' fill='%23fff' opacity='.55'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23a06a50' stroke-width='1.6' stroke-linecap='round' d='M11 20l-3 9M16 22v8M21 20l3 9'/%3E%3Cpath fill='%23c9a07a' stroke='%23140410' d='M8 14c0 6 4 9 8 9s8-3 8-9z'/%3E%3Cpath fill='%238a3c6c' stroke='%23140410' d='M2 15C2 7 9 3 16 3s14 4 14 12c-3-2-6-2-8 0-2-2-10-2-12 0-2-2-5-2-8 0z'/%3E%3Ccircle cx='12' cy='12' r='1.3' fill='%23ffb020'/%3E%3Ccircle cx='20' cy='12' r='1.3' fill='%23ffb020'/%3E%3C/svg%3E");
+
+  --_claw: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath fill='%235c2450' stroke='%230a0208' d='M1 1c6 0 12 2 17 7-5-2-9-1-11 2-2 3-2 7 0 11C2 17 1 9 1 1z'/%3E%3Cpath fill='%23e2c8a4' stroke='%230a0208' stroke-width='.7' d='M3 3c5 0 10 1 15 5-5-1-8 0-10 2-1-3-3-5-5-7z'/%3E%3Ccircle cx='5.5' cy='12' r='1.6' fill='%23ffa020'/%3E%3C/svg%3E");
+}
+
+/* --- Panels: carapace frame with glossy ridge, claw corners --- */
+.sc2-zerg .sc-frame, .sc2-zerg .sc-panel, .sc2-zerg .sc-dialog {
+  border: 1px solid #0a0208;
+  border-radius: 10px 4px;
+  background-image: radial-gradient(ellipse at 50% 0, rgba(120, 40, 100, .28), transparent 65%);
+  box-shadow:
+    inset 0 1px 0 rgba(230, 160, 210, .45),
+    inset 0 0 0 3px #4a1a40,
+    inset 0 0 0 4px #7a3a6a,
+    inset 0 0 0 5px #0a0208,
+    inset 0 0 22px rgba(90, 20, 70, .4),
+    0 0 0 1px #2c0c26,
+    0 4px 14px rgba(0, 0, 0, .7);
+}
+.sc2-zerg .sc-dialog::before, .sc2-zerg .sc-dialog::after,
+.sc2-zerg .sc-panel::before, .sc2-zerg .sc-panel::after,
+.sc2-zerg .sc-frame::before, .sc2-zerg .sc-frame::after {
+  content: "";
+  inset: -8px;
+  background: var(--_claw) left top / 30px 30px no-repeat;
+}
+.sc2-zerg .sc-dialog::after, .sc2-zerg .sc-panel::after, .sc2-zerg .sc-frame::after { transform: rotate(180deg); }
+
+.sc2-zerg h1, .sc2-zerg h2, .sc2-zerg h3, .sc2-zerg .sc-dialog-title {
+  text-shadow: 0 1px 2px #000, 0 0 8px rgba(255, 110, 10, .45);
+}
+
+/* --- Buttons: fleshy bars, amber rim glow (shadows, no clip-path) --- */
+.sc2-zerg .sc-btn {
+  border: 1px solid rgba(232, 112, 30, .8);
+  border-radius: 12px 4px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: inset 0 1px 0 rgba(240, 170, 220, .35), inset 0 0 0 1px #5a2050,
+    inset 0 0 8px rgba(255, 110, 20, .3), 0 0 0 1px #000, 0 0 5px rgba(255, 110, 20, .35);
+}
+.sc2-zerg .sc-btn:hover, .sc2-zerg .sc-btn.is-hover {
+  border-color: #ffb040;
+  text-shadow: 0 1px 2px #000, 0 0 6px rgba(255, 150, 40, .8);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 230, .45), inset 0 0 0 1px #7a2c66,
+    inset 0 0 12px rgba(255, 130, 30, .5), 0 0 0 1px #000, 0 0 10px rgba(255, 130, 30, .75);
+}
+.sc2-zerg .sc-btn:active, .sc2-zerg .sc-btn.is-active {
+  color: #f0c8a0;
+  border-color: #a04a18;
+  box-shadow: inset 0 2px 6px #000, inset 0 0 0 1px #2c0a24, 0 0 0 1px #000, 0 0 3px rgba(255, 110, 20, .3);
+}
+.sc2-zerg .sc-btn:focus-visible { box-shadow: inset 0 0 8px rgba(255, 110, 20, .4), 0 0 0 1px #000, 0 0 0 3px var(--sc-accent-hi); }
+.sc2-zerg .sc-btn:disabled, .sc2-zerg .sc-btn.is-disabled {
+  border-color: #3e2234;
+  box-shadow: inset 0 0 0 1px #2c0c26, 0 0 0 1px #000;
+  text-shadow: none;
+}
+
+/* --- Glue labels --- */
+.sc2-zerg .sc-glue { text-shadow: 0 2px 3px #000, 0 0 6px rgba(255, 90, 0, .3); }
+.sc2-zerg .sc-glue:hover, .sc2-zerg .sc-glue.is-hover {
+  text-shadow: 0 2px 3px #000, 0 0 8px rgba(255, 130, 20, .9), 0 0 18px rgba(255, 80, 0, .6);
+}
+
+/* --- Fields, lists, tabs --- */
+.sc2-zerg .sc-input, .sc2-zerg .sc-select, .sc2-zerg .sc-textarea, .sc2-zerg .sc-list, .sc2-zerg .sc-well {
+  border-radius: 3px;
+  box-shadow: inset 0 0 8px #000, 0 0 0 1px #4a1a40, 0 1px 0 1px rgba(180, 110, 160, .4);
+}
+.sc2-zerg .sc-input:focus, .sc2-zerg .sc-select:focus, .sc2-zerg .sc-textarea:focus {
+  box-shadow: inset 0 0 8px #000, 0 0 0 1px #ff8a1e, 0 0 8px rgba(255, 120, 20, .5);
+}
+.sc2-zerg .sc-list > li.is-selected,
+.sc2-zerg .sc-list > li[aria-selected="true"],
+.sc2-zerg .sc-list > .sc-list-item.is-selected {
+  box-shadow: inset 3px 0 0 #ff8a1e, inset 0 1px 0 rgba(255, 160, 220, .2), inset 0 -1px 0 #000, inset 10px 0 10px -6px rgba(255, 120, 20, .5);
+}
+.sc2-zerg .sc-tabs { border-bottom-color: #2c0c26; box-shadow: 0 1px 0 rgba(255, 138, 30, .45); }
+.sc2-zerg .sc-tab { border-radius: 10px 10px 0 0 / 7px 7px 0 0; box-shadow: inset 0 1px 0 rgba(180, 100, 160, .3); }
+.sc2-zerg .sc-tab.is-active, .sc2-zerg .sc-tab[aria-selected="true"] {
+  color: #ffb44a;
+  text-shadow: 0 0 6px rgba(255, 120, 20, .8);
+  box-shadow: inset 0 2px 0 #ff8a1e, inset 0 6px 10px -4px rgba(255, 120, 20, .45);
+}
+
+/* --- Command card: chitin sockets, fleshy bevel, amber glow --- */
+.sc2-zerg .sc-cmd-btn {
+  border-radius: 5px;
+  box-shadow: inset 2px 2px 0 rgba(210, 120, 180, .35), inset -2px -2px 0 rgba(10, 0, 8, .8),
+    inset 0 0 0 3px #4a1a40, inset 0 0 0 4px rgba(0, 0, 0, .6), 0 0 0 1px #2c0c26;
+}
+.sc2-zerg .sc-cmd-btn:hover, .sc2-zerg .sc-cmd-btn.is-hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 150, 50, .8), inset 0 0 0 3px #5a2050,
+    inset 0 0 12px rgba(255, 120, 20, .55), 0 0 0 1px #2c0c26, 0 0 8px rgba(255, 120, 20, .6);
+}
+.sc2-zerg .sc-cmd-btn:active, .sc2-zerg .sc-cmd-btn.is-active {
+  box-shadow: inset 0 3px 8px #000, inset 0 0 0 3px #22091e, 0 0 0 1px #2c0c26;
+}
+.sc2-zerg .sc-cmd-btn.is-selected {
+  color: #fff3c0;
+  box-shadow: inset 0 0 0 2px #ffc04a, inset 0 0 14px rgba(255, 150, 30, .75),
+    0 0 0 1px #000, 0 0 12px rgba(255, 140, 30, .85);
+}
+.sc2-zerg .sc-cmd-btn:disabled, .sc2-zerg .sc-cmd-btn.is-disabled {
+  box-shadow: inset 0 0 0 3px #22091e, 0 0 0 1px #1a0616;
+}
+
+/* --- Console: carapace humps over minimap (::before) and command card
+   (::after = same hump mirrored & wider), the middle sits 40px lower --- */
+.sc2-zerg .sc-console { padding-top: 56px; }
+.sc2-zerg .sc-info, .sc2-zerg .sc-portrait {
+  background: radial-gradient(ellipse at 50% 30%, #1e0a1e, #050106 75%);
+}
+.sc2-zerg .sc-info, .sc2-zerg .sc-portrait, .sc2-zerg .sc-minimap { border-radius: 9px 5px; }
+.sc2-zerg .sc-console > .sc-cmd { border-radius: 8px; background: rgba(8, 1, 8, .55); box-shadow: inset 0 0 10px #000, 0 0 0 1px #0a0208, 0 -1px 0 1px rgba(160, 90, 140, .4); }
+.sc2-zerg .sc-console::before, .sc2-zerg .sc-console::after {
+  content: "";
+  inset: 0 0 auto;
+  height: 58px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 58' preserveAspectRatio='none'%3E%3ClinearGradient id='c' x2='0' y2='1'%3E%3Cstop offset='.1' stop-color='%23a8689a'/%3E%3Cstop offset='.4' stop-color='%23561e4c'/%3E%3Cstop offset='.8' stop-color='%2341163a'/%3E%3C/linearGradient%3E%3Cg fill='%23e6cca6' stroke='%230a0208'%3E%3Cpath d='M28 18C26 9 33 2 46 0c-7 5-9 10-8 17zM74 12c0-7 9-11 22-11-9 3-12 7-12 13zM126 18c4-7 13-11 25-10-10 3-13 7-14 13z'/%3E%3C/g%3E%3Cpath fill='url(%23c)' stroke='%230a0208' d='M0 58V20C20 10 50 7 80 9c22 1 36 6 50 12 30 10 56 20 80 28 16 5 34 8 50 9z'/%3E%3Cpath fill='none' stroke='%23f0b8e0' stroke-opacity='.55' stroke-width='1.5' d='M2 22C22 13 50 10 80 12c22 1 36 6 50 12 28 10 52 19 74 26'/%3E%3Cellipse cx='176' cy='38' rx='8' ry='3' fill='%23ffa020'/%3E%3Cellipse cx='104' cy='22' rx='5' ry='2.4' fill='%23c8f040' opacity='.8'/%3E%3C/svg%3E") left bottom / 270px 58px no-repeat;
+}
+.sc2-zerg .sc-console::after { transform: scaleX(-1); background-size: 350px 58px; }
+@media (max-width: 760px) {
+  .sc2-zerg .sc-console::before { background-size: 45% 58px; }
+  .sc2-zerg .sc-console::after { background-size: 52% 58px; }
+}
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II protoss skin  (scope: .sc2-protoss)
+   Polished gold/bronze over navy stone, ivory plates, khaydarin crystals,
+   cyan psionic glow. Smooth arcs drawn with gradients + drop-shadow trims.
+   ========================================================================== */
+.sc2-protoss {
+  --sc-panel-bg: rgba(5, 14, 34, .9);
+  --sc-panel-bg-solid: #050e22;
+  --sc-frame-hi: #fff2c0;
+  --sc-frame: #d4a64a;
+  --sc-frame-mid: #8c6224;
+  --sc-frame-lo: #4a300c;
+  --sc-frame-dark: #0a0804;
+  --sc-accent: #3cc8ff;
+  --sc-accent-hi: #c8f4ff;
+  --sc-glow: rgba(60, 190, 255, .65);
+  --sc-text-dim: #7894b4;
+  --sc-title: #f2dc98;
+  --sc-label: #dcecff;
+  --sc-label-hover: #fff;
+  --sc-label-disabled: #5c6878;
+  --sc-btn-bg: linear-gradient(#1c4078, #0d2350 55%, #071632);
+  --sc-btn-bg-hover: linear-gradient(#2a5ea4, #143470 55%, #0a1e44);
+  --sc-btn-bg-active: linear-gradient(#040c20, #08183a 50%, #0e2448);
+  --sc-cmd-bg: radial-gradient(90% 80% at 50% 35%, #1d4c8c, #0a1e44 65%, #040b1e);
+  --sc-cmd-bg-hover: radial-gradient(90% 80% at 50% 35%, #2c6cb8, #10306a 65%, #061230);
+  --sc-cmd-bg-active: radial-gradient(90% 80% at 50% 50%, #0a2250, #040b1e);
+  --sc-field-bg: #030a1a;
+  --sc-select-bg: linear-gradient(90deg, #7fe0ff 0 2px, #1c56a0 2px, #0c2a5c);
+  --sc-icon: #b4e8ff;
+  --sc-icon-hover: #fff;
+  --sc-icon-disabled: #3c4a5c;
+  --sc-scroll-track: #030916;
+  --sc-scroll-thumb: #a07a34;
+  --sc-tooltip-bg: rgba(4, 12, 30, .95);
+  --sc-tooltip-border: rgba(90, 190, 255, .65);
+  --sc-glue: #7fd0ff;
+  --sc-glue-hover: #e8fbff;
+  --sc-title-rule:
+    radial-gradient(closest-side, #9ce8ff, #3cc8ff40 60%, #0000) 50% 100% / 50% 3px no-repeat,
+    linear-gradient(90deg, #0000, #d4a64a 18% 82%, #0000) 0 100% / 100% 1px no-repeat;
+  --sc-screen-shadow: 0 0 0 1px #0a0804, 0 -1px 0 2px #fff2c0, 0 0 0 3px #d4a64a, 0 1px 0 4px #6a4614, 0 0 0 5px #0a0804, 0 0 14px 5px rgba(50, 170, 255, .2);
+  --_n: #18233e;
+  --sc-console-bg: linear-gradient(var(--_n), #0f1830 45%, #070d1c);
+  --sc-console-texture:
+    linear-gradient(90deg, #0000 8%, rgba(90, 200, 255, .7) 30% 70%, #0000 92%) 0 6px / 100% 1px no-repeat,
+    linear-gradient(90deg, #e8dcc0 0 3px, #d4a64a 3px 5px, #0000 5px calc(100% - 5px), #d4a64a 0 calc(100% - 3px), #e8dcc0 0);
+  --sc-console-rim: 36px;
+  --sc-console-edge: none;
+  --_gem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'%3E%3Cellipse cx='12' cy='8' rx='11.5' ry='7.5' fill='%23d4a64a' stroke='%234a300c'/%3E%3Cpath fill='%231c6ad8' d='M12 1.5l7 6.5-7 6.5-7-6.5z'/%3E%3Cpath fill='%23aef0ff' d='M12 1.5v6.5H5z'/%3E%3Cpath fill='%2350c8ff' d='M12 1.5l7 6.5h-7z'/%3E%3C/svg%3E");
+  --_halo: radial-gradient(closest-side, rgba(80, 200, 255, .55), #0000);
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23062050' stroke-width='.8' stroke-linejoin='round'%3E%3Cpath fill='%231f4fb8' d='M2 29l6-15v15z'/%3E%3Cpath fill='%237cc8ff' d='M8 14l5 15H8z'/%3E%3Cpath fill='%231f4fb8' d='M19 29l5-12v12z'/%3E%3Cpath fill='%237cc8ff' d='M24 17l6 12h-6z'/%3E%3Cpath fill='%232a6ee0' d='M10 29l6-27v27z'/%3E%3Cpath fill='%23b4ecff' d='M16 2l6 27h-6z'/%3E%3C/g%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3CradialGradient id='g' cx='.4' cy='.35'%3E%3Cstop offset='0' stop-color='%23e4ffb0'/%3E%3Cstop offset='.45' stop-color='%2350e040'/%3E%3Cstop offset='1' stop-color='%230a5a18'/%3E%3C/radialGradient%3E%3Cellipse cx='16' cy='14' rx='8' ry='10' fill='url(%23g)'/%3E%3Cpath fill='none' stroke='%23e0b450' stroke-width='2.4' stroke-linecap='round' d='M7 25C3 18 4 9 10 4M25 25c4-7 3-16-3-21'/%3E%3Cpath fill='%23d4a64a' stroke='%234a300c' stroke-width='.8' d='M6 25h20l-3 5H9z'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%231c5ad0' d='M16 2l7 11-7 11-7-11z'/%3E%3Cpath fill='%23aef0ff' d='M16 2v11H9z'/%3E%3Cpath fill='%2350c8ff' d='M16 2l7 11h-7z'/%3E%3Cpath fill='none' stroke='%23e0b450' stroke-width='2.4' stroke-linecap='round' d='M8 28C3 21 4 12 9 6M24 28c5-7 4-16-1-22'/%3E%3Cpath fill='%23d4a64a' stroke='%234a300c' stroke-width='.8' d='M7 26h18l-3 4H10z'/%3E%3C/svg%3E");
+}
+
+/* --- Panels / dialogs: rounded gold frame, navy glass, psionic glow ---- */
+.sc2-protoss .sc-panel,
+.sc2-protoss .sc-dialog,
+.sc2-protoss .sc-frame {
+  border-radius: 7px;
+  background-image: radial-gradient(120% 70% at 50% 0, rgba(60, 170, 255, .16), #0000 70%);
+  box-shadow:
+    inset 0 1px 0 var(--sc-frame-hi),
+    inset 0 -1px 0 var(--sc-frame-lo),
+    inset 0 0 0 3px var(--sc-frame),
+    inset 0 0 0 4px var(--sc-frame-mid),
+    inset 0 0 0 5px var(--sc-frame-dark),
+    inset 0 0 22px 4px rgba(60, 170, 255, .14),
+    0 0 0 1px rgba(0, 0, 0, .7),
+    0 6px 20px rgba(0, 0, 0, .5);
+}
+/* crest: swept gold arc on the top edge with a khaydarin gem */
+.sc2-protoss .sc-panel::before,
+.sc2-protoss .sc-dialog::before,
+.sc2-protoss .sc-frame::before {
+  content: "";
+  top: -10px;
+  left: 50%;
+  width: 96px;
+  height: 15px;
+  margin-left: -48px;
+  background:
+    var(--_gem) 50% 0 / 24px 16px no-repeat,
+    radial-gradient(closest-side, #0000 74%, #d4a64a 76% 96%, #0000) 50% 6px / 96px 26px no-repeat,
+    radial-gradient(closest-side, var(--sc-panel-bg-solid) 98%, #0000) 50% 6px / 92px 24px no-repeat;
+  mask: linear-gradient(#000 12px, #0000 12px);
+  filter: drop-shadow(0 -1px 0 #fff2c0) drop-shadow(0 0 4px rgba(80, 200, 255, .5));
+}
+.sc2-protoss .sc-dialog::after {
+  content: "";
+  left: 20%;
+  right: 20%;
+  bottom: 2px;
+  height: 2px;
+  background: radial-gradient(closest-side, #9ce8ff, rgba(60, 200, 255, .3) 60%, #0000);
+}
+.sc2-protoss .sc-dialog-title {
+  padding-top: 8px;
+  text-shadow: 0 1px 2px #000, 0 0 8px rgba(240, 210, 130, .35);
+}
+
+/* --- Buttons: dark blue bars, gold trim, cyan inner glow ------------- */
+.sc2-protoss .sc-btn {
+  border-radius: 3px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow:
+    inset 0 1px 0 #fff2c080,
+    inset 0 0 0 1px #c09040,
+    inset 0 0 0 2px #050c1c,
+    inset 0 0 9px 1px rgba(60, 190, 255, .3);
+}
+.sc2-protoss .sc-btn::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 2px;
+  height: 1px;
+  background: radial-gradient(closest-side, #8fe4ff, #0000);
+  pointer-events: none;
+}
+.sc2-protoss .sc-btn:hover,
+.sc2-protoss .sc-btn.is-hover {
+  text-shadow: 0 1px 2px #000, 0 0 8px var(--sc-glow);
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 1px #e0b450,
+    inset 0 0 0 2px #050c1c,
+    inset 0 0 14px 2px rgba(80, 210, 255, .55),
+    0 0 8px rgba(60, 190, 255, .45);
+}
+.sc2-protoss .sc-btn:active,
+.sc2-protoss .sc-btn.is-active {
+  box-shadow: inset 0 0 0 1px #8c6224, inset 0 0 0 2px #050c1c, inset 0 2px 8px #000;
+}
+.sc2-protoss .sc-btn:focus-visible {
+  box-shadow: inset 0 0 0 1px #e0b450, inset 0 0 0 2px var(--sc-accent-hi), inset 0 0 12px rgba(80, 210, 255, .5);
+}
+.sc2-protoss .sc-btn:disabled,
+.sc2-protoss .sc-btn.is-disabled { filter: saturate(.25) brightness(.75); }
+
+.sc2-protoss .sc-glue:hover,
+.sc2-protoss .sc-glue.is-hover { text-shadow: 0 1px 2px #000, 0 0 8px var(--sc-glow), 0 0 18px var(--sc-glow); }
+
+/* --- Command card: gold bezel, dark blue glass ---------------------- */
+.sc2-protoss .sc-cmd-btn {
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 2px #c09040,
+    inset 0 -1px 0 2px #6a4614,
+    inset 0 0 0 3px #050c1c,
+    inset 0 0 8px 4px rgba(0, 0, 0, .45);
+}
+.sc2-protoss .sc-cmd-btn:hover,
+.sc2-protoss .sc-cmd-btn.is-hover {
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 2px #e0b450,
+    inset 0 0 0 3px #050c1c,
+    inset 0 0 12px 3px rgba(80, 210, 255, .55),
+    0 0 7px rgba(60, 190, 255, .5);
+}
+.sc2-protoss .sc-cmd-btn:active,
+.sc2-protoss .sc-cmd-btn.is-active {
+  box-shadow: inset 0 0 0 2px #8c6224, inset 0 0 0 3px #050c1c, inset 0 2px 10px #000;
+}
+.sc2-protoss .sc-cmd-btn.is-selected {
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 2px #e8fbff,
+    inset 0 0 0 3px #3cc8ff,
+    inset 0 0 14px 4px rgba(120, 230, 255, .75),
+    0 0 9px rgba(120, 230, 255, .7);
+}
+.sc2-protoss .sc-cmd-btn:disabled,
+.sc2-protoss .sc-cmd-btn.is-disabled { filter: saturate(.3) brightness(.7); }
+
+/* --- Lists, tabs, fields -------------------------------------------- */
+.sc2-protoss .sc-list > li:hover { color: #bfefff; }
+.sc2-protoss .sc-list > li.is-selected,
+.sc2-protoss .sc-list > li[aria-selected="true"],
+.sc2-protoss .sc-list > .sc-list-item.is-selected {
+  box-shadow: inset 0 1px 0 rgba(140, 220, 255, .35), inset 0 -1px 0 rgba(0, 0, 0, .5), inset 0 0 10px rgba(60, 190, 255, .25);
+}
+.sc2-protoss .sc-tabs { border-bottom-color: #4a300c; box-shadow: 0 1px 0 #d4a64a; }
+.sc2-protoss .sc-tab {
+  border-radius: 5px 5px 0 0;
+  box-shadow: inset 0 1px 0 #8c6224, inset 1px 0 0 #4a300c, inset -1px 0 0 #4a300c;
+}
+.sc2-protoss .sc-tab.is-active,
+.sc2-protoss .sc-tab[aria-selected="true"] {
+  color: #e8fbff;
+  background: linear-gradient(#2a68ac, #10306a 70%, #0c2654);
+  text-shadow: 0 0 8px var(--sc-glow);
+  box-shadow: inset 0 2px 0 #7fe0ff, inset 1px 0 0 #d4a64a, inset -1px 0 0 #d4a64a, inset 0 0 12px rgba(80, 210, 255, .45);
+}
+.sc2-protoss .sc-check > input[type="radio"] { border-radius: 50%; }
+.sc2-protoss .sc-check > input:checked::after {
+  border-radius: inherit;
+  background: #8fe4ff;
+  box-shadow: 0 0 5px #3cc8ff;
+}
+
+/* --- Console: navy stone body, gold-trimmed swept arcs, crystals ---- */
+.sc2-protoss .sc-console { padding-top: 48px; }
+.sc2-protoss .sc-minimap,
+.sc2-protoss .sc-info,
+.sc2-protoss .sc-portrait { border-radius: 4px; }
+.sc2-protoss .sc-info,
+.sc2-protoss .sc-portrait {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, .07), #0000 40%),
+    radial-gradient(120% 90% at 50% 0, #123266, #06142e 60%, #030a1a);
+}
+.sc2-protoss .sc-console::before {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 37px;
+  --_s: radial-gradient(closest-side, var(--_n) 99%, #0000);
+  background:
+    var(--_s) 50% 13px / 36% 46px,
+    var(--_s) -20px 6px / 230px 74px,
+    var(--_s) right -20px top 6px / 270px 74px,
+    linear-gradient(var(--_n) 0 0) 0 25px / 100% 12px;
+  background-repeat: no-repeat;
+  filter:
+    drop-shadow(0 -1px 0 #e8dcc0) drop-shadow(0 -1px 0 #e8dcc0)
+    drop-shadow(0 -2px 0 #d4a64a) drop-shadow(0 -1px 0 #fff2c0)
+    drop-shadow(0 -1px 0 #2a1806) drop-shadow(0 -2px 5px rgba(60, 190, 255, .35));
+}
+.sc2-protoss .sc-console::after {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  background:
+    var(--_gem) 50% 4px / 30px 20px,
+    var(--_halo) 50% 0 / 64px 34px,
+    var(--_gem) 83px 0 / 24px 16px,
+    var(--_halo) 71px 0 / 48px 24px,
+    var(--_gem) right 103px top 0 / 24px 16px,
+    var(--_halo) right 91px top 0 / 48px 24px;
+  background-repeat: no-repeat;
+}

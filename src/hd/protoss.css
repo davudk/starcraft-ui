@@ -1,0 +1,27 @@
+/* ==========================================================================
+   STARCRAFT UI — modern protoss refinements  (scope: .sc-hd.sc-protoss / .sc-hd .sc-protoss)
+   ========================================================================== */
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) {
+  --sc-glow: rgba(64,196,248,.5);
+  --sc-btn-bg: linear-gradient(#1e4c5a, #163d4a 20%, #0f2f3a 48%, #0b2630 56%, #071d25 85%, #05171e);
+  --sc-btn-bg-hover: linear-gradient(#2a6476, #1e5060 20%, #153e4c 48%, #10323e 56%, #0b2630 85%, #081e26);
+  --sc-btn-bg-active: linear-gradient(#03121a, #062028 40%, #0c2e3a 80%, #123846);
+  --sc-console-bg: linear-gradient(#2e393e, #263136 18%, #1e292e 45%, #152024 72%, #0e171b 92%, #0a1216);
+  --sc-select-bg: linear-gradient(#16708e, #0e5470 55%, #0a4058);
+  --sc-tooltip-border: var(--sc-frame-mid);
+  --_hd-screen: #04161e;
+  --_gem: radial-gradient(closest-side at 45% 42%, #fff 12%, #a8ecfc 26%, #48ccf8 40% 56%, #1048a0 68% 76%, #fce890 80% 87%, #5c3c10 93%, #0000);
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-dialog::after {
+  inset: -7px;
+  background-size: 18px 13px, 26px 16px, 14px 14px, 14px 14px, 14px 14px, 14px 14px;
+  filter: drop-shadow(0 0 3px rgba(56,192,248,.45));
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) :is(.sc-panel, .sc-frame)::after {
+  inset: -5px;
+  background-size: 12px 12px;
+  filter: drop-shadow(0 0 2px rgba(56,192,248,.4));
+}
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-dialog::before { filter: drop-shadow(0 -1px 0 #140c00) drop-shadow(0 -2px 4px rgba(252,224,100,.18)); }
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) .sc-console::after { filter: drop-shadow(0 0 3px rgba(56,192,248,.5)); }
+:is(.sc-hd.sc-protoss, .sc-hd .sc-protoss) :is(.sc-dialog-title, h1, .sc-h1) { text-shadow: 0 1px 0 #000, 0 0 12px rgba(252,224,100,.28); }

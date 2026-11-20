@@ -1,0 +1,31 @@
+/* ==========================================================================
+   STARCRAFT UI — modern terran refinements  (scope: .sc-hd.sc-terran / .sc-hd .sc-terran)
+   ========================================================================== */
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) {
+  --sc-glow: rgba(60,220,150,.42);
+  --sc-btn-bg: linear-gradient(#59616a, #40464e 22%, #2e3339 48%, #23272c 52%, #1b1e22 80%, #15171a);
+  --sc-btn-bg-hover: linear-gradient(#6a737d, #4c535b 22%, #373d44 48%, #2b3036 52%, #212428 80%, #1a1c20);
+  --sc-btn-bg-active: linear-gradient(#0e1013, #171a1d 40%, #22262a 80%, #2a2e33);
+  --sc-cmd-bg: linear-gradient(#6b747d, #565d65 30%, #464d54 55%, #383e44 85%, #30353a);
+  --sc-cmd-bg-hover: linear-gradient(#7a838c, #626a72 30%, #50575e 55%, #41474d 85%, #383d42);
+  --sc-console-bg: linear-gradient(#66707a, #545c64 12%, #474e56 30%, #3b4148 60%, #2e3338 85%, #24282c);
+  --sc-select-bg: linear-gradient(#245464, #1a3e4c);
+  /* HD bolt plate: same 1998 plate, drawn smooth with a round screw head */
+  --_tr-bolt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath fill='%2307080a' d='M0 0h11v11H0z'/%3E%3Cpath fill='%23808890' d='M1 1h9v9H1z'/%3E%3Cpath fill='%23d8e0e8' d='M1 1h9v1H2v8H1z'/%3E%3Cpath fill='%23353a40' d='M2 10h8V2H9v7H2z'/%3E%3Ccircle cx='5.5' cy='5.5' r='2.7' fill='%2320252a'/%3E%3Ccircle cx='5.3' cy='5.3' r='2' fill='%23a8b0b8'/%3E%3Cpath stroke='%23353a40' stroke-width='.9' d='M3.9 6.7l2.8-2.8'/%3E%3C/svg%3E");
+  --_tr-hazard: repeating-linear-gradient(-45deg, #b49424 0 3px, #8a6e14 3px 4px, #141517 4px 7px, #141517 7px 8px);
+  --_hd-screen: #0a1014;
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) :is(.sc-panel, .sc-dialog, .sc-frame)::before {
+  inset: -3px;
+  background-size: 11px 11px;
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-dialog::after {
+  inset: -4px 0;
+  background-size: 48px 8px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.6));
+}
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-dialog-title { padding-bottom: 9px; }
+:is(.sc-hd.sc-terran, .sc-hd .sc-terran) .sc-console::after {
+  background-size: 11px 11px, 11px 11px, 11px 11px, 11px 11px, 100% 3px, 100% 4px;
+  background-position: 4px 6px, calc(var(--_l) - 15px) 6px, calc(100% - var(--_r) + 4px) 6px, right 4px top 6px, left bottom, left bottom;
+}

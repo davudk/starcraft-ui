@@ -1,0 +1,208 @@
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II terran skin  (scope: .sc2-terran)
+   Blue-grey gunmetal plating, 45° chamfers, recessed dark-glass screens,
+   thin cyan LED rims. Menus are blue-cyan (not SC1 yellow).
+   ========================================================================== */
+.sc2-terran {
+  --sc-panel-bg: rgba(4, 10, 18, .9);
+  --sc-panel-bg-solid: #050b13;
+  --sc-frame-hi: #9fb2c6;
+  --sc-frame: #4f5f70;
+  --sc-frame-mid: #2f3b48;
+  --sc-frame-lo: #1a222c;
+  --sc-frame-dark: #04070b;
+
+  --sc-accent: #3aa8ff;
+  --sc-accent-hi: #a8e4ff;
+  --sc-glow: rgba(60, 170, 255, .6);
+  --sc-glue: #8fd0ff;
+  --sc-glue-hover: #f0faff;
+
+  --sc-title: #bfe4ff;
+  --sc-label: #d4ecff;
+  --sc-label-hover: #fff;
+  --sc-text-dim: #7c90a6;
+
+  --sc-btn-bg: linear-gradient(#22405e, #142a40 50%, #0c1b2c 51%, #0a1624);
+  --sc-btn-bg-hover: linear-gradient(#2e5680, #1b3a5a 50%, #112a44 51%, #0e2236);
+  --sc-btn-bg-active: linear-gradient(#060d16, #0b1724 60%, #10223a);
+
+  --sc-field-bg: #03070c;
+  --sc-select-bg: linear-gradient(90deg, rgba(44, 140, 235, .7), rgba(30, 90, 170, .35));
+
+  --sc-icon: #c4e2ff;
+  --sc-icon-hover: #fff;
+  --sc-icon-disabled: #46505a;
+  --sc-cmd-bg: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 45%), radial-gradient(circle at 50% 40%, #1f3850, #0b1520 75%);
+  --sc-cmd-bg-hover: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,0) 45%), radial-gradient(circle at 50% 40%, #2b5072, #0f1e2e 75%);
+  --sc-cmd-bg-active: radial-gradient(circle at 50% 55%, #10202f, #04080d 80%);
+
+  --sc-scroll-track: #04070b;
+  --sc-scroll-thumb: #45596e;
+  --sc-tooltip-border: #3a7cb4;
+
+  --sc-title-rule:
+    linear-gradient(90deg, transparent, #5cc0ff 20% 80%, transparent) left bottom / 100% 1px no-repeat,
+    linear-gradient(rgba(40, 110, 190, 0), rgba(40, 110, 190, .28)) left bottom / 100% 100% no-repeat;
+  --sc-screen-shadow: 0 0 0 1px #0b1118, 0 0 0 3px #4f5f70, 0 0 0 4px #1a222c, 0 0 0 5px #04070b,
+    0 0 6px 5px rgba(60, 160, 255, .2), inset 0 0 14px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(140, 200, 255, .25);
+
+  --sc-console-rim: 18px;
+  --sc-console-edge: linear-gradient(#04070b 0 1px, #8fa2b6 1px 2px, rgba(80, 185, 255, .75) 3px 4px, transparent 4px);
+  --sc-console-bg: linear-gradient(#4b5866, #333f4c 30%, #252e38 70%, #171d24);
+  --sc-console-texture:
+    linear-gradient(transparent 24px, rgba(0,0,0,.4) 24px 25px, rgba(255,255,255,.07) 25px 26px, transparent 26px),
+    repeating-linear-gradient(90deg, transparent 0 239px, rgba(0,0,0,.4) 239px 240px, rgba(255,255,255,.07) 240px 241px, transparent 241px 480px),
+    repeating-linear-gradient(rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%231a52b8' d='M3 29l2-12 5-4 2 16z'/%3E%3Cpath fill='%2368b4ff' d='M10 13l2 16H7z'/%3E%3Cpath fill='%231f5fd0' d='M20 29l4-13 5 3v10z'/%3E%3Cpath fill='%2380c8ff' d='M24 16l5 3-2 10z'/%3E%3Cpath fill='%232f7ae8' d='M16 2l-6 10 2 17h4z'/%3E%3Cpath fill='%239ad8ff' d='M16 2l6 10-2 17h-4z'/%3E%3Cpath fill='%23e8f8ff' fill-opacity='.7' d='M16 2l-3 10 3 15z'/%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='11' y='1' width='10' height='5' rx='1.5' fill='%23b8c2cc'/%3E%3Crect x='7' y='5' width='18' height='24' rx='3' fill='%230e3a12'/%3E%3Crect x='10' y='8' width='12' height='18' rx='2' fill='%2340d83a'/%3E%3Crect x='12' y='9' width='3' height='16' rx='1.5' fill='%23c4ffb4'/%3E%3Cpath fill='%23707e8c' d='M7 13h18v2H7zM7 20h18v2H7z'/%3E%3Crect x='8' y='27' width='16' height='4' rx='1' fill='%238a96a2'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23687786' d='M2 23l5-9h18l5 9v6H2z'/%3E%3Cpath fill='%23aebbc8' d='M7 14l3-7h12l3 7z'/%3E%3Cpath fill='%23dbe4ec' d='M10 7h12l-1 2H11z'/%3E%3Cpath fill='%23363f4a' d='M2 25h28v4H2z'/%3E%3Cpath fill='%235aff4a' d='M9 18h5v3H9zM18 18h5v3h-5z'/%3E%3C/svg%3E");
+}
+
+/* --- Panels / dialogs: chamfered glass with a steel frame + cyan inner rim --- */
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame) {
+  --_c1: 14px;
+  --_c2: 6px;
+  border-color: transparent;
+  box-shadow: inset 0 0 40px rgba(30, 110, 200, .14);
+  clip-path: polygon(var(--_c1) 0, calc(100% - var(--_c2)) 0, 100% var(--_c2), 100% calc(100% - var(--_c1)),
+    calc(100% - var(--_c1)) 100%, var(--_c2) 100%, 0 calc(100% - var(--_c2)), 0 var(--_c1));
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::before,
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::after {
+  content: "";
+  /* ring = chamfered outline (cuts --_k1/--_k2) minus itself inset by --_w */
+  --_a: calc(var(--_k1) + var(--_w) * .41);
+  --_b: calc(var(--_k2) + var(--_w) * .41);
+  --_x: calc(100% - var(--_w));
+  clip-path: polygon(evenodd,
+    var(--_k1) 0, calc(100% - var(--_k2)) 0, 100% var(--_k2), 100% calc(100% - var(--_k1)),
+    calc(100% - var(--_k1)) 100%, var(--_k2) 100%, 0 calc(100% - var(--_k2)), 0 var(--_k1), var(--_k1) 0,
+    var(--_a) var(--_w), calc(100% - var(--_b)) var(--_w), var(--_x) var(--_b), var(--_x) calc(100% - var(--_a)),
+    calc(100% - var(--_a)) var(--_x), var(--_b) var(--_x), var(--_w) calc(100% - var(--_b)), var(--_w) var(--_a), var(--_a) var(--_w));
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::before {
+  inset: -2px;
+  --_k1: var(--_c1); --_k2: var(--_c2); --_w: 5px;
+  background:
+    linear-gradient(90deg, transparent 32%, #6cc8ff 32% 68%, transparent 68%) top / 100% 2px no-repeat,
+    linear-gradient(#93a6ba, #4f5f70 30%, #2c3744 70%, #3d4a58);
+}
+.sc2-terran :is(.sc-panel, .sc-dialog, .sc-frame)::after {
+  inset: 4px;
+  --_k1: calc(var(--_c1) - 3.5px); --_k2: calc(var(--_c2) - 3.5px); --_w: 1px;
+  background: rgba(100, 195, 255, .8);
+}
+
+.sc2-terran :is(h1, h2, .sc-h1, .sc-h2, .sc-dialog-title) { text-shadow: 0 0 8px rgba(60, 160, 255, .55), 0 1px 1px #000; }
+
+/* --- Buttons: steel-blue bars, chamfered ends, glow drawn inside --- */
+.sc2-terran .sc-btn {
+  border-color: transparent;
+  text-shadow: 0 0 6px rgba(80, 180, 255, .5), 0 1px 1px #000;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: inset 0 0 0 1px rgba(100, 180, 240, .6), inset 0 0 0 2px rgba(0, 0, 0, .6),
+    inset 0 0 10px rgba(50, 150, 255, .22), inset 0 1px 0 2px rgba(160, 210, 255, .1);
+}
+.sc2-terran .sc-btn::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 4.7px, rgba(120, 200, 255, .8) 4.7px 6.2px, transparent 6.2px) left top / 10px 10px no-repeat,
+    linear-gradient(-45deg, transparent 4.7px, rgba(120, 200, 255, .8) 4.7px 6.2px, transparent 6.2px) right bottom / 10px 10px no-repeat;
+}
+.sc2-terran .sc-btn:is(:hover, .is-hover, :focus-visible) {
+  text-shadow: 0 0 8px rgba(120, 210, 255, .9), 0 1px 1px #000;
+  box-shadow: inset 0 0 0 1px rgba(150, 220, 255, .95), inset 0 0 0 2px rgba(0, 0, 0, .5),
+    inset 0 0 14px rgba(70, 175, 255, .5), inset 0 1px 0 2px rgba(180, 225, 255, .15);
+}
+.sc2-terran .sc-btn:is(:active, .is-active) {
+  color: #bfe0ff;
+  box-shadow: inset 0 0 0 1px rgba(80, 150, 210, .6), inset 0 3px 8px rgba(0, 0, 0, .85);
+}
+.sc2-terran .sc-btn:is(:disabled, .is-disabled) {
+  background: linear-gradient(#272c32, #1a1e22 50%, #131619);
+  text-shadow: 0 1px 1px #000;
+  box-shadow: inset 0 0 0 1px #3a4148, inset 0 0 0 2px rgba(0, 0, 0, .6);
+}
+.sc2-terran .sc-btn:is(:disabled, .is-disabled)::before { opacity: .3; filter: grayscale(1); }
+
+.sc2-terran .sc-glue:hover,
+.sc2-terran .sc-glue.is-hover { text-shadow: 0 0 6px var(--sc-glow), 0 0 16px var(--sc-glow), 0 2px 2px #000; }
+
+/* --- Command card: steel bevel, glassy highlight; selected = green-white --- */
+.sc2-terran .sc-cmd-btn {
+  border-color: #04070b;
+  box-shadow: inset 1px 1px 0 #9fb2c6, inset -1px -1px 0 #1a222c, inset 0 0 0 2px #3c4a5a, inset 0 0 0 3px #04070b;
+}
+.sc2-terran .sc-cmd-btn:is(:hover, .is-hover) {
+  box-shadow: inset 0 0 0 1px #c8ecff, inset 0 0 0 2px #4aa8f0, inset 0 0 0 3px #04070b, inset 0 0 12px rgba(80, 180, 255, .55);
+}
+.sc2-terran .sc-cmd-btn:is(:active, .is-active) {
+  box-shadow: inset 1px 1px 0 #1a222c, inset -1px -1px 0 #6f8296, inset 0 0 0 2px #253040, inset 0 3px 8px #000;
+}
+.sc2-terran .sc-cmd-btn.is-selected {
+  color: #eaffe4;
+  box-shadow: inset 0 0 0 1px #eaffe0, inset 0 0 0 2px #6ef05a, inset 0 0 0 3px #04070b, inset 0 0 14px rgba(110, 240, 90, .55);
+}
+.sc2-terran .sc-cmd-btn.is-selected > * { filter: drop-shadow(0 0 3px rgba(140, 255, 120, .8)); }
+.sc2-terran .sc-cmd-btn:is(:disabled, .is-disabled) { background: radial-gradient(#1c2128, #0c0f13 80%); }
+
+/* --- Lists & tabs --- */
+.sc2-terran .sc-list > :is(li.is-selected, li[aria-selected="true"], .sc-list-item.is-selected) {
+  box-shadow: inset 2px 0 0 #a8e4ff, inset 0 1px 0 rgba(150, 210, 255, .45), inset 0 -1px 0 rgba(150, 210, 255, .25);
+}
+.sc2-terran .sc-tabs { border-bottom-color: #1a222c; box-shadow: 0 1px 0 #3a7cb4; }
+.sc2-terran .sc-tab {
+  padding: 4px 18px 5px;
+  border: 0;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
+  background: linear-gradient(#26313c, #141a21);
+  box-shadow: inset 0 1px 0 #4f5f70;
+}
+.sc2-terran .sc-tab:hover { color: #d4ecff; }
+.sc2-terran .sc-tab:is(.is-active, [aria-selected="true"]) {
+  color: #fff;
+  background: linear-gradient(#2f6aa6, #163a60 60%, #0e2a48);
+  box-shadow: inset 0 2px 0 #7ccfff, inset 0 0 12px rgba(80, 180, 255, .4);
+  text-shadow: 0 0 6px rgba(120, 210, 255, .8);
+}
+
+/* --- Console: raised housings over minimap + command card, low centre --- */
+.sc2-terran .sc-console {
+  --_l: min(178px, 30%);
+  --_r: min(270px, 40%);
+  isolation: isolate;
+}
+.sc2-terran .sc-console::before,
+.sc2-terran .sc-console::after { content: ""; z-index: -1; }
+.sc2-terran .sc-console::before {
+  inset: 0 0 auto;
+  height: 30px;
+  clip-path: polygon(0 10px, 10px 0, var(--_l) 0, calc(var(--_l) + 18px) 18px, calc(100% - var(--_r) - 18px) 18px,
+    calc(100% - var(--_r)) 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1.5px), #9cb0c4 0 50%, transparent 0) var(--_l) 0 / 18px 18px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1.5px), #9cb0c4 0 50%, transparent 0) calc(100% - var(--_r) - 18px) 0 / 18px 18px no-repeat,
+    linear-gradient(transparent 5px, #5cc0ff 5px 6px, transparent 6px) 24px 0 / calc(var(--_l) - 44px) 100% no-repeat,
+    linear-gradient(transparent 5px, #5cc0ff 5px 6px, transparent 6px) right 24px top 0 / calc(var(--_r) - 44px) 100% no-repeat,
+    linear-gradient(#9cb0c4 0 1px, #637282 1px, #4b5866 18px, transparent 18px);
+}
+.sc2-terran .sc-console::after {
+  inset: 0;
+  --_bolt: radial-gradient(circle, #d2dde8 0 1px, #56677a 1.5px 2px, #0a0e13 2.5px 3px, transparent 3.5px);
+  background:
+    var(--_bolt) 10px 6px / 8px 8px no-repeat,
+    var(--_bolt) calc(var(--_l) - 18px) 6px / 8px 8px no-repeat,
+    var(--_bolt) calc(100% - var(--_r) + 10px) 6px / 8px 8px no-repeat,
+    var(--_bolt) right 10px top 6px / 8px 8px no-repeat,
+    linear-gradient(transparent calc(100% - 5px), #04070b 0 calc(100% - 4px), rgba(80, 185, 255, .7) 0 calc(100% - 3px), #0d1218 0);
+}
+
+/* Recessed dark-glass screens */
+.sc2-terran :is(.sc-info, .sc-portrait) {
+  background: linear-gradient(165deg, rgba(120, 190, 255, .1), rgba(120, 190, 255, 0) 40%), #02060b;
+}

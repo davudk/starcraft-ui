@@ -1,0 +1,210 @@
+/* ==========================================================================
+   STARCRAFT UI — modern SC1 layer  (scope: .sc-hd, combined with sc-terran|sc-zerg|sc-protoss)
+   Remastered-style: same frames/ornaments/palette, anti-aliased type,
+   2px bevels, soft depth, accent glows. Only race-neutral rules here.
+   ========================================================================== */
+.sc-hd, .sc-hd .sc {
+  --sc-font: "Chakra Petch", "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  --sc-font-title: "Rajdhani", "Chakra Petch", "Segoe UI", sans-serif;
+  --sc-font-size: 14px;
+  --sc-line: 1.4;
+  --sc-bevel: 2px;
+  --sc-cmd-size: 40px;
+  /* SC1 text colours, softened a touch for anti-aliased strokes */
+  --sc-c-pale: #c2c6f0;
+  --sc-c-yellow: #ecdc50;
+  --sc-c-green: #3cf04c;
+  --sc-c-red: #e43434;
+  --sc-c-grey: #8c8c96;
+  --sc-hp-high: #3cf04c;
+  --_hd-drop: 0 12px 30px rgba(0,0,0,.6), 0 3px 8px rgba(0,0,0,.55);
+  --_hd-ease: .13s ease-out;
+  letter-spacing: .015em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: auto;
+  image-rendering: auto;
+  text-rendering: optimizeLegibility;
+}
+.sc-hd :is(h1, h2, h3, h4, .sc-h1, .sc-h2, .sc-h3) { font-weight: 700; letter-spacing: .04em; line-height: 1.15; }
+.sc-hd :is(h1, .sc-h1) { font-size: 2.3em; text-shadow: 0 2px 0 #000, 0 0 18px rgba(236,220,80,.18); }
+.sc-hd :is(h2, .sc-h2) { font-size: 1.6em; }
+.sc-hd :is(h3, .sc-h3) { font-size: 1.25em; }
+.sc-hd :is(.sc-messages, .sc-notice, .sc-transmission, .sc-resources, .sc-shadow) { text-shadow: 0 1px 2px #000, 0 0 1px #000; }
+.sc-hd .sc-resources { font-weight: 600; }
+.sc-hd .sc-res::before { width: 16px; height: 16px; }
+.sc-hd .sc-table th { font-weight: 600; }
+
+/* --- Frames: 2px bevel + soft drop ------------------------------------ */
+.sc-hd :is(.sc-frame, .sc-panel, .sc-dialog) {
+  background-image: linear-gradient(rgba(255,255,255,.045), transparent 90px);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi),
+    inset -1px -1px 0 var(--sc-frame-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--sc-frame-hi) 45%, var(--sc-frame)),
+    inset -2px -2px 0 color-mix(in srgb, var(--sc-frame-lo) 60%, var(--sc-frame)),
+    inset 0 0 0 4px var(--sc-frame),
+    inset 0 0 0 5px var(--sc-frame-mid),
+    inset 0 0 0 6px var(--sc-frame-dark),
+    inset 0 10px 20px -12px rgba(0,0,0,.9),
+    0 0 0 1px rgba(0,0,0,.7),
+    var(--_hd-drop);
+}
+.sc-hd .sc-dialog { -webkit-backdrop-filter: blur(6px) saturate(1.2); backdrop-filter: blur(6px) saturate(1.2); }
+.sc-hd .sc-dialog-title {
+  font-weight: 700;
+  font-size: 1.3em;
+  letter-spacing: .07em;
+  text-shadow: 0 1px 0 #000, 0 0 10px rgba(236,220,80,.22);
+}
+.sc-hd :is(.sc-well, .sc-list, .sc-input, .sc-select, .sc-textarea) {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.8), inset 1px 1px 0 var(--sc-frame-lo),
+    0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+
+/* --- Buttons ---------------------------------------------------------- */
+.sc-hd .sc-btn {
+  --sc-btn-px: 16px;
+  --_hd-ring: var(--sc-frame-mid);
+  --_hd-out: 0 1px 3px rgba(0,0,0,.7);
+  height: 30px;
+  line-height: 28px;
+  font-weight: 500;
+  text-shadow: 0 1px 1px #000, 0 0 4px rgba(0,0,0,.6);
+  transition: color var(--_hd-ease), box-shadow var(--_hd-ease), filter var(--_hd-ease);
+  box-shadow:
+    inset 1px 1px 0 var(--_bevel-hi), inset -1px -1px 0 var(--_bevel-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--_bevel-hi) 30%, transparent),
+    inset -2px -2px 0 color-mix(in srgb, var(--_bevel-lo) 70%, transparent),
+    inset 0 0 0 3px var(--_hd-ring),
+    inset 0 12px 10px -8px rgba(255,255,255,.07),
+    var(--_hd-out);
+}
+.sc-hd .sc-btn-sm { --sc-btn-px: 10px; height: 24px; line-height: 22px; }
+.sc-hd .sc-btn-lg { --sc-btn-px: 26px; height: 38px; line-height: 36px; }
+.sc-hd .sc-btn:is(:hover, .is-hover) { --_hd-out: 0 1px 3px rgba(0,0,0,.7), 0 0 0 1px var(--sc-accent), 0 0 12px var(--sc-glow); text-shadow: 0 1px 1px #000, 0 0 8px var(--sc-glow); }
+.sc-hd .sc-btn:is(:active, .is-active) {
+  --_bevel-hi: var(--sc-frame-lo);
+  --_bevel-lo: var(--sc-frame-hi);
+  --_hd-ring: var(--sc-frame-lo);
+  --_hd-out: 0 0 0 transparent;
+}
+.sc-hd :is(.sc-btn, .sc-cmd-btn, .sc-tab, .sc-glue, .sc-sel, .sc-range, .sc-check > input):focus-visible {
+  outline: 2px solid var(--sc-accent-hi);
+  outline-offset: 2px;
+}
+.sc-hd .sc-glue {
+  font-weight: 700;
+  font-size: 1.85em;
+  line-height: 1.1;
+  letter-spacing: .03em;
+  text-shadow: 0 2px 0 #000, 0 0 10px rgba(0,0,0,.8);
+  transition: color var(--_hd-ease), text-shadow var(--_hd-ease);
+}
+.sc-hd .sc-glue:is(:hover, .is-hover) { text-shadow: 0 2px 0 #000, 0 0 8px var(--sc-glow), 0 0 22px var(--sc-glow); }
+.sc-hd .sc-glue small { font-family: var(--sc-font); font-weight: 400; font-size: .44em; letter-spacing: .03em; text-shadow: 0 1px 1px #000; }
+
+/* --- Form controls ---------------------------------------------------- */
+.sc-hd :is(.sc-input, .sc-select) { height: 28px; padding: 3px 8px; }
+.sc-hd .sc-textarea { padding: 5px 8px; }
+.sc-hd :is(.sc-input, .sc-select, .sc-textarea) { transition: box-shadow var(--_hd-ease); }
+.sc-hd :is(.sc-input, .sc-select, .sc-textarea):focus {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.8), 0 0 0 1px var(--sc-accent), 1px 1px 0 1px var(--sc-accent-hi), 0 0 10px var(--sc-glow);
+}
+.sc-hd .sc-chatline > .sc-input { height: auto; padding: 0; box-shadow: none; }
+.sc-hd .sc-select {
+  padding-right: 26px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--sc-label) 50%) right 12px top 11px / 6px 6px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--sc-label) 50%) right 7px top 11px / 6px 6px no-repeat,
+    var(--sc-field-bg);
+}
+.sc-hd .sc-label { margin-bottom: 4px; }
+.sc-hd .sc-check { gap: 8px; }
+.sc-hd .sc-check > input {
+  width: 16px;
+  height: 16px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.9), 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+  transition: box-shadow var(--_hd-ease);
+}
+.sc-hd .sc-check:hover > input { box-shadow: 0 0 0 1px var(--sc-accent), 1px 1px 0 1px var(--sc-accent-hi), 0 0 8px var(--sc-glow); }
+.sc-hd .sc-check > input:checked::after {
+  inset: 3px;
+  background: linear-gradient(#b4ffb8, var(--sc-c-green) 45%, #14a020);
+  box-shadow: 0 0 6px rgba(60,240,76,.7);
+}
+.sc-hd .sc-range { height: 22px; }
+.sc-hd .sc-range::-webkit-slider-runnable-track {
+  background: linear-gradient(#000, #0c0e10);
+  box-shadow: inset 0 1px 2px #000, 0 0 0 1px var(--sc-frame-mid), 1px 1px 0 1px var(--sc-frame-hi);
+}
+.sc-hd .sc-range::-webkit-slider-thumb {
+  width: 12px;
+  height: 20px;
+  margin-top: -8px;
+  background: linear-gradient(90deg, var(--sc-frame-hi) 0 2px, var(--sc-frame) 2px 60%, var(--sc-frame-mid) calc(100% - 2px), var(--sc-frame-lo) 0);
+  box-shadow: 0 1px 3px rgba(0,0,0,.8);
+  transition: box-shadow var(--_hd-ease);
+}
+.sc-hd .sc-range:hover::-webkit-slider-thumb { box-shadow: 0 1px 3px #000, 0 0 8px var(--sc-glow); }
+.sc-hd .sc-range::-moz-range-thumb { width: 10px; height: 18px; }
+
+/* --- Lists, scrollbars, tabs, tooltips -------------------------------- */
+.sc-hd .sc-list > :is(li, .sc-list-item) { padding: 3px 8px; transition: color var(--_hd-ease), background-color var(--_hd-ease); }
+.sc-hd .sc-list > :is(li, .sc-list-item):not(.is-selected, [aria-selected="true"], .is-header, .is-disabled):hover { background-color: rgba(255,255,255,.06); }
+.sc-hd .sc-list > :is(li.is-selected, li[aria-selected="true"], .sc-list-item.is-selected) {
+  box-shadow: inset 2px 0 0 var(--sc-accent-hi), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.5);
+}
+.sc-hd :is(.sc-scroll, .sc-list, .sc-textarea)::-webkit-scrollbar { width: 12px; height: 12px; }
+.sc-hd :is(.sc-scroll, .sc-list, .sc-textarea)::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--sc-frame-hi), var(--sc-scroll-thumb) 30% 70%, var(--sc-frame-lo));
+}
+.sc-hd .sc-tab { padding: 5px 14px 6px; font-weight: 500; transition: color var(--_hd-ease); }
+.sc-hd .sc-tab:is(.is-active, [aria-selected="true"]) {
+  padding-bottom: 8px;
+  box-shadow: inset 0 2px 0 var(--sc-accent), inset 1px 0 0 var(--sc-frame-hi), inset -1px 0 0 var(--sc-frame-lo), 0 -4px 10px -4px var(--sc-glow);
+}
+.sc-hd :is(.sc-tooltip, [data-sc-tip]:hover::after) {
+  padding: 5px 9px 6px;
+  font-family: var(--sc-font);
+  line-height: 1.35;
+  box-shadow: 0 0 0 1px #000, 0 6px 16px rgba(0,0,0,.65);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.sc-hd .sc-tooltip-cost { margin-top: 3px; }
+
+/* --- Command card, screens, vitals ------------------------------------ */
+.sc-hd .sc-cmd-btn {
+  --_hd-out: 0 1px 3px rgba(0,0,0,.75);
+  transition: color var(--_hd-ease), box-shadow var(--_hd-ease);
+  box-shadow:
+    inset 1px 1px 0 var(--sc-frame-hi), inset -1px -1px 0 var(--sc-frame-lo),
+    inset 2px 2px 0 color-mix(in srgb, var(--sc-frame-hi) 35%, transparent),
+    inset -2px -2px 0 color-mix(in srgb, var(--sc-frame-lo) 70%, transparent),
+    inset 0 0 0 3px var(--sc-frame-mid), inset 0 0 0 4px rgba(0,0,0,.55),
+    var(--_hd-out);
+}
+.sc-hd .sc-cmd-btn > .sc-glyph { width: 26px; height: 26px; }
+.sc-hd .sc-cmd-btn:is(:hover, .is-hover) { --_hd-out: 0 1px 3px rgba(0,0,0,.75), 0 0 0 1px var(--sc-accent), 0 0 12px var(--sc-glow); }
+.sc-hd .sc-cmd-btn:is(:active, .is-active) {
+  box-shadow: inset 1px 1px 0 var(--sc-frame-lo), inset -1px -1px 0 var(--sc-frame-hi), inset 0 0 0 3px var(--sc-frame-lo), inset 0 3px 8px rgba(0,0,0,.7);
+}
+.sc-hd .sc-cmd-btn.is-selected {
+  box-shadow: inset 1px 1px 0 var(--sc-frame-lo), inset -1px -1px 0 var(--sc-frame-hi), inset 0 0 0 2px var(--sc-c-green), inset 0 0 10px rgba(60,240,76,.45), 0 0 8px rgba(60,240,76,.35);
+}
+.sc-hd .sc-cmd-btn:is(:disabled, .is-disabled) { --_hd-out: 0 1px 3px rgba(0,0,0,.75); }
+.sc-hd .sc-cmd-btn:is(:disabled, .is-disabled) > * { filter: none; }
+.sc-hd .sc-info { background-image: radial-gradient(ellipse at 50% 30%, var(--_hd-screen, #0b0f14), #000 75%); }
+.sc-hd .sc-sel { transition: border-color var(--_hd-ease), box-shadow var(--_hd-ease); }
+.sc-hd .sc-sel:hover { box-shadow: 0 0 6px var(--sc-glow); }
+.sc-hd .sc-bar { height: 6px; }
+.sc-hd .sc-bar-lg { height: 9px; }
+.sc-hd .sc-progress { height: 12px; }
+.sc-hd .sc-progress::before { background: linear-gradient(var(--sc-progress-hi), var(--sc-progress) 55%, color-mix(in srgb, var(--sc-progress) 60%, #000)); box-shadow: 0 0 6px color-mix(in srgb, var(--sc-progress) 50%, transparent); }
+.sc-hd .sc-timer { padding: 2px 8px; box-shadow: 0 0 0 1px #000, 0 2px 6px rgba(0,0,0,.6); }
+.sc-hd .sc-table td { padding: 4px 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-hd *, .sc-hd *::before, .sc-hd *::after { transition: none !important; }
+}

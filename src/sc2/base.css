@@ -1,0 +1,202 @@
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II era layer  (scope: .sc2)
+   Usage: <div class="sc sc2 sc2-terran">  (sc2-terran | sc2-zerg | sc2-protoss)
+   Shared by all three SC2 races: smooth rendering, SC2 type, SC2 palette,
+   5×3 command card and the SC2 console arrangement. Race files add the look.
+   ========================================================================== */
+.sc2 {
+  /* --- rendering: anti-aliased, high-res --- */
+  -webkit-font-smoothing: antialiased;
+  font-smooth: auto;
+  image-rendering: auto;
+  text-rendering: optimizeLegibility;
+
+  --sc-font: "Exo 2", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --sc-font-title: "Michroma", "Exo 2", "Segoe UI", sans-serif;
+  --sc-font-size: 14px;
+  --sc-line: 1.35;
+
+  /* --- SC2 text palette --- */
+  --sc-c-pale: #c6d6e8;     /* default UI text: cool light blue-grey */
+  --sc-c-yellow: #ffc81e;   /* hotkeys, highlights */
+  --sc-c-white: #ffffff;
+  --sc-c-grey: #7d8790;
+  --sc-c-red: #ff3c32;
+  --sc-c-green: #5ae641;
+  --sc-c-orange: #ff8c1e;
+  --sc-c-blue: #3aa0ff;
+
+  /* --- SC2 player colours --- */
+  --sc-p1: #b4141e;  /* red        */
+  --sc-p2: #0042ff;  /* blue       */
+  --sc-p3: #1ca7ea;  /* teal       */
+  --sc-p4: #540081;  /* purple     */
+  --sc-p5: #ebe129;  /* yellow     */
+  --sc-p6: #fe8a0e;  /* orange     */
+  --sc-p7: #168000;  /* green      */
+  --sc-p8: #cca6fc;  /* light pink */
+
+  /* --- vitals --- */
+  --sc-hp-high: #3cd22a;
+  --sc-hp-mid: #e6c81e;
+  --sc-hp-low: #dc2a1e;
+  --sc-shield: #4ab4ff;
+  --sc-energy: #c85aff;
+
+  --sc-text: var(--sc-c-pale);
+  --sc-text-dim: #7c8ea2;
+  --sc-label-disabled: #6a737c;
+  --sc-field-text: #ffffff;
+  --sc-progress: #2c9cff;
+  --sc-progress-hi: #9cd8ff;
+
+  --sc-tooltip-bg: rgba(4, 10, 18, .94);
+  --sc-cmd-size: 44px;
+  --sc-cmd-cols: 5;
+}
+
+.sc2 img,
+.sc2 canvas,
+.sc2 svg { image-rendering: auto; }
+
+/* Hover/press feedback is animated in SC2 */
+.sc2 .sc-btn,
+.sc2 .sc-cmd-btn,
+.sc2 .sc-tab,
+.sc2 .sc-glue,
+.sc2 .sc-list > li {
+  transition: color .12s, background-color .12s, box-shadow .12s, filter .12s, text-shadow .12s;
+}
+
+/* Headings and dialog titles: wide, spaced, upper-case */
+.sc2 h1, .sc2 h2, .sc2 h3,
+.sc2 .sc-h1, .sc2 .sc-h2, .sc2 .sc-h3,
+.sc2 .sc-dialog-title {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: normal;
+}
+.sc2 h1, .sc2 .sc-h1 { font-size: 1.7em; }
+.sc2 h2, .sc2 .sc-h2 { font-size: 1.2em; }
+.sc2 h3, .sc2 .sc-h3 { font-size: .95em; }
+.sc2 .sc-dialog-title { font-size: .95em; }
+
+/* Buttons: bold caps captions */
+.sc2 .sc-btn {
+  height: 32px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: .9em;
+}
+.sc2 .sc-btn-sm { height: 24px; line-height: 22px; font-size: .78em; }
+.sc2 .sc-btn-lg { height: 40px; line-height: 38px; font-size: 1em; }
+.sc2 .sc-btn:active,
+.sc2 .sc-btn.is-active { padding-top: 1px; padding-left: calc(var(--sc-btn-px) + 1px); padding-right: calc(var(--sc-btn-px) - 1px); }
+
+/* Glue menu: SC2 main-menu style caps */
+.sc2 .sc-glue {
+  font-family: var(--sc-font);
+  font-weight: 700;
+  font-size: 1.45em;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.sc2 .sc-glue small { text-transform: none; letter-spacing: .02em; font-weight: 400; font-size: .48em; }
+
+/* Form fields: taller, anti-aliased */
+.sc2 .sc-input,
+.sc2 .sc-select { height: 28px; padding: 3px 8px; }
+.sc2 .sc-select { padding-right: 24px; }
+.sc2 .sc-check > input { width: 15px; height: 15px; }
+
+/* Resources: white numbers, icons slightly larger */
+.sc2 .sc-resources {
+  gap: 18px;
+  color: var(--sc-c-white);
+  font-weight: 600;
+  text-shadow: 0 1px 2px #000, 0 0 4px rgba(0, 0, 0, .8);
+}
+.sc2 .sc-res::before { width: 18px; height: 18px; }
+.sc2 .sc-res.is-short { color: var(--sc-c-red); }
+.sc2 .sc-ico { width: 16px; height: 16px; vertical-align: -3px; }
+
+/* Stats: SC2 shows "45 / 45" in white with coloured bars */
+.sc2 .sc-stat { font-weight: 600; }
+
+/* Bars: thin black separators, glossy */
+.sc2 .sc-bar { height: 6px; --seg: 5px; border-radius: 1px; }
+.sc2 .sc-bar::before {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(var(--seg) - 1px), rgba(0,0,0,.75) 0 var(--seg)),
+    linear-gradient(rgba(255,255,255,.45), rgba(255,255,255,0) 50%, rgba(0,0,0,.3)),
+    var(--_fill);
+}
+.sc2 .sc-bar-lg { height: 9px; --seg: 7px; }
+
+.sc2 .sc-progress { height: 12px; }
+
+/* Tooltip: SC2's dark translucent card with gold hotkey */
+.sc2 .sc-tooltip,
+.sc2 [data-sc-tip]:hover::after {
+  padding: 6px 10px 7px;
+  color: var(--sc-c-pale);
+  box-shadow: 0 0 0 1px #000, 0 4px 14px rgba(0, 0, 0, .6);
+}
+.sc2 .sc-tooltip .sc-hk { font-weight: 700; }
+.sc2 .sc-tooltip-cost { gap: 14px; margin-top: 4px; font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Console: SC2 arrangement  minimap | portrait | info | command card (5×3)
+   -------------------------------------------------------------------------- */
+.sc2 .sc-console {
+  grid-template-columns: 150px 96px minmax(0, 1fr) auto;
+  grid-template-areas: "map portrait info cmd";
+  align-items: end;
+  gap: 12px;
+  padding: 26px 12px 10px;
+  isolation: isolate;   /* console ornaments stay behind the screens */
+}
+.sc2 .sc-console::before,
+.sc2 .sc-console::after { z-index: -1; }
+.sc2 .sc-minimap { width: 150px; height: 150px; }
+.sc2 .sc-portrait { width: 96px; height: 110px; align-self: end; }
+.sc2 .sc-info { min-height: 130px; padding: 10px 14px; }
+.sc2 .sc-cmd { gap: 4px; padding: 6px; }
+.sc2 .sc-cmd-btn > .sc-glyph { width: 28px; height: 28px; }
+.sc2 .sc-cmd-btn > img { width: 100%; height: 100%; }
+.sc2 .sc-unit { grid-template-columns: 80px 1fr; }
+.sc2 .sc-unit-wire { width: 80px; height: 80px; }
+.sc2 .sc-unit-name { font-weight: 600; letter-spacing: .03em; }
+.sc2 .sc-selection { grid-template-columns: repeat(8, 38px); grid-template-rows: repeat(3, 38px); grid-auto-rows: 38px; }
+
+/* Portrait static → SC2 holographic flicker */
+.sc2 .sc-portrait.is-static::after {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.55) 0 1px, transparent 1px 3px),
+    linear-gradient(rgba(120, 200, 255, .25), rgba(120, 200, 255, .05));
+}
+
+@media (max-width: 760px) {
+  .sc2 .sc-console {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "info info" "map cmd";
+  }
+  .sc2 .sc-portrait { display: none; }
+}
+@media (max-width: 560px) {
+  .sc2 { --sc-cmd-size: 34px; }
+  .sc2 .sc-console { gap: 8px; padding-left: 8px; padding-right: 8px; }
+  .sc2 .sc-cmd { gap: 3px; padding: 4px; }
+  .sc2 .sc-cmd-btn > .sc-glyph { width: 22px; height: 22px; }
+  .sc2 .sc-minimap { width: 100px; height: 100px; }
+}
+
+/* Messages: SC2 chat */
+.sc2 .sc-messages { gap: 2px; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+.sc2 .sc-msg.is-system { color: var(--sc-c-yellow); }
+.sc2 .sc-notice { font-size: 1.15em; color: #ffd84a; text-shadow: 0 1px 2px #000, 0 0 6px #000; }
+
+/* Cursor: SC2 uses a larger, smooth arrow; keep the colour semantics */
+.sc2 .sc-select-ring { border-width: 2px; }

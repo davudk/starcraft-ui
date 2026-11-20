@@ -1,0 +1,22 @@
+/* ==========================================================================
+   STARCRAFT UI — modern zerg refinements  (scope: .sc-hd.sc-zerg / .sc-hd .sc-zerg)
+   ========================================================================== */
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) {
+  --sc-glow: rgba(244,110,24,.48);
+  --sc-btn-bg: linear-gradient(#6a3220, #4e2214 22%, #3a160e 48%, #2c0e0e 56%, #200809 82%, #170506);
+  --sc-btn-bg-hover: linear-gradient(#84422a, #622c1a 22%, #481c12 48%, #361210 56%, #260a0a 82%, #1c0607);
+  --sc-btn-bg-active: linear-gradient(#100303, #1a0707 40%, #2a0e0b 80%, #34140f);
+  --sc-console-bg: linear-gradient(#5e2a1a, #4c1e12 15%, #3c140d 40%, #2c0e0c 68%, #1e0707 90%, #160404);
+  --sc-select-bg: linear-gradient(#5e2040, #44142c);
+  --sc-tooltip-bg: rgba(16,4,6,.88);
+  --sc-tooltip-border: var(--sc-frame);
+  --_hd-screen: #170708;
+}
+/* Claws: 16px pixel art redrawn 1.5x so they hold their own next to the larger type */
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) :is(.sc-dialog, .sc-panel, .sc-frame)::before,
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) :is(.sc-dialog, .sc-panel, .sc-frame)::after {
+  inset: -10px;
+  background-size: 24px 24px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.55));
+}
+:is(.sc-hd.sc-zerg, .sc-hd .sc-zerg) .sc-console::before { filter: drop-shadow(0 -1px 2px rgba(0,0,0,.5)); }

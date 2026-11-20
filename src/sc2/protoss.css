@@ -1,0 +1,250 @@
+/* ==========================================================================
+   STARCRAFT UI — StarCraft II protoss skin  (scope: .sc2-protoss)
+   Polished gold/bronze over navy stone, ivory plates, khaydarin crystals,
+   cyan psionic glow. Smooth arcs drawn with gradients + drop-shadow trims.
+   ========================================================================== */
+.sc2-protoss {
+  --sc-panel-bg: rgba(5, 14, 34, .9);
+  --sc-panel-bg-solid: #050e22;
+  --sc-frame-hi: #fff2c0;
+  --sc-frame: #d4a64a;
+  --sc-frame-mid: #8c6224;
+  --sc-frame-lo: #4a300c;
+  --sc-frame-dark: #0a0804;
+  --sc-accent: #3cc8ff;
+  --sc-accent-hi: #c8f4ff;
+  --sc-glow: rgba(60, 190, 255, .65);
+  --sc-text-dim: #7894b4;
+  --sc-title: #f2dc98;
+  --sc-label: #dcecff;
+  --sc-label-hover: #fff;
+  --sc-label-disabled: #5c6878;
+  --sc-btn-bg: linear-gradient(#1c4078, #0d2350 55%, #071632);
+  --sc-btn-bg-hover: linear-gradient(#2a5ea4, #143470 55%, #0a1e44);
+  --sc-btn-bg-active: linear-gradient(#040c20, #08183a 50%, #0e2448);
+  --sc-cmd-bg: radial-gradient(90% 80% at 50% 35%, #1d4c8c, #0a1e44 65%, #040b1e);
+  --sc-cmd-bg-hover: radial-gradient(90% 80% at 50% 35%, #2c6cb8, #10306a 65%, #061230);
+  --sc-cmd-bg-active: radial-gradient(90% 80% at 50% 50%, #0a2250, #040b1e);
+  --sc-field-bg: #030a1a;
+  --sc-select-bg: linear-gradient(90deg, #7fe0ff 0 2px, #1c56a0 2px, #0c2a5c);
+  --sc-icon: #b4e8ff;
+  --sc-icon-hover: #fff;
+  --sc-icon-disabled: #3c4a5c;
+  --sc-scroll-track: #030916;
+  --sc-scroll-thumb: #a07a34;
+  --sc-tooltip-bg: rgba(4, 12, 30, .95);
+  --sc-tooltip-border: rgba(90, 190, 255, .65);
+  --sc-glue: #7fd0ff;
+  --sc-glue-hover: #e8fbff;
+  --sc-title-rule:
+    radial-gradient(closest-side, #9ce8ff, #3cc8ff40 60%, #0000) 50% 100% / 50% 3px no-repeat,
+    linear-gradient(90deg, #0000, #d4a64a 18% 82%, #0000) 0 100% / 100% 1px no-repeat;
+  --sc-screen-shadow: 0 0 0 1px #0a0804, 0 -1px 0 2px #fff2c0, 0 0 0 3px #d4a64a, 0 1px 0 4px #6a4614, 0 0 0 5px #0a0804, 0 0 14px 5px rgba(50, 170, 255, .2);
+  --_n: #18233e;
+  --sc-console-bg: linear-gradient(var(--_n), #0f1830 45%, #070d1c);
+  --sc-console-texture:
+    linear-gradient(90deg, #0000 8%, rgba(90, 200, 255, .7) 30% 70%, #0000 92%) 0 6px / 100% 1px no-repeat,
+    linear-gradient(90deg, #e8dcc0 0 3px, #d4a64a 3px 5px, #0000 5px calc(100% - 5px), #d4a64a 0 calc(100% - 3px), #e8dcc0 0);
+  --sc-console-rim: 36px;
+  --sc-console-edge: none;
+  --_gem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'%3E%3Cellipse cx='12' cy='8' rx='11.5' ry='7.5' fill='%23d4a64a' stroke='%234a300c'/%3E%3Cpath fill='%231c6ad8' d='M12 1.5l7 6.5-7 6.5-7-6.5z'/%3E%3Cpath fill='%23aef0ff' d='M12 1.5v6.5H5z'/%3E%3Cpath fill='%2350c8ff' d='M12 1.5l7 6.5h-7z'/%3E%3C/svg%3E");
+  --_halo: radial-gradient(closest-side, rgba(80, 200, 255, .55), #0000);
+
+  --sc-icon-mineral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23062050' stroke-width='.8' stroke-linejoin='round'%3E%3Cpath fill='%231f4fb8' d='M2 29l6-15v15z'/%3E%3Cpath fill='%237cc8ff' d='M8 14l5 15H8z'/%3E%3Cpath fill='%231f4fb8' d='M19 29l5-12v12z'/%3E%3Cpath fill='%237cc8ff' d='M24 17l6 12h-6z'/%3E%3Cpath fill='%232a6ee0' d='M10 29l6-27v27z'/%3E%3Cpath fill='%23b4ecff' d='M16 2l6 27h-6z'/%3E%3C/g%3E%3C/svg%3E");
+  --sc-icon-gas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3CradialGradient id='g' cx='.4' cy='.35'%3E%3Cstop offset='0' stop-color='%23e4ffb0'/%3E%3Cstop offset='.45' stop-color='%2350e040'/%3E%3Cstop offset='1' stop-color='%230a5a18'/%3E%3C/radialGradient%3E%3Cellipse cx='16' cy='14' rx='8' ry='10' fill='url(%23g)'/%3E%3Cpath fill='none' stroke='%23e0b450' stroke-width='2.4' stroke-linecap='round' d='M7 25C3 18 4 9 10 4M25 25c4-7 3-16-3-21'/%3E%3Cpath fill='%23d4a64a' stroke='%234a300c' stroke-width='.8' d='M6 25h20l-3 5H9z'/%3E%3C/svg%3E");
+  --sc-icon-supply: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%231c5ad0' d='M16 2l7 11-7 11-7-11z'/%3E%3Cpath fill='%23aef0ff' d='M16 2v11H9z'/%3E%3Cpath fill='%2350c8ff' d='M16 2l7 11h-7z'/%3E%3Cpath fill='none' stroke='%23e0b450' stroke-width='2.4' stroke-linecap='round' d='M8 28C3 21 4 12 9 6M24 28c5-7 4-16-1-22'/%3E%3Cpath fill='%23d4a64a' stroke='%234a300c' stroke-width='.8' d='M7 26h18l-3 4H10z'/%3E%3C/svg%3E");
+}
+
+/* --- Panels / dialogs: rounded gold frame, navy glass, psionic glow ---- */
+.sc2-protoss .sc-panel,
+.sc2-protoss .sc-dialog,
+.sc2-protoss .sc-frame {
+  border-radius: 7px;
+  background-image: radial-gradient(120% 70% at 50% 0, rgba(60, 170, 255, .16), #0000 70%);
+  box-shadow:
+    inset 0 1px 0 var(--sc-frame-hi),
+    inset 0 -1px 0 var(--sc-frame-lo),
+    inset 0 0 0 3px var(--sc-frame),
+    inset 0 0 0 4px var(--sc-frame-mid),
+    inset 0 0 0 5px var(--sc-frame-dark),
+    inset 0 0 22px 4px rgba(60, 170, 255, .14),
+    0 0 0 1px rgba(0, 0, 0, .7),
+    0 6px 20px rgba(0, 0, 0, .5);
+}
+/* crest: swept gold arc on the top edge with a khaydarin gem */
+.sc2-protoss .sc-panel::before,
+.sc2-protoss .sc-dialog::before,
+.sc2-protoss .sc-frame::before {
+  content: "";
+  top: -10px;
+  left: 50%;
+  width: 96px;
+  height: 15px;
+  margin-left: -48px;
+  background:
+    var(--_gem) 50% 0 / 24px 16px no-repeat,
+    radial-gradient(closest-side, #0000 74%, #d4a64a 76% 96%, #0000) 50% 6px / 96px 26px no-repeat,
+    radial-gradient(closest-side, var(--sc-panel-bg-solid) 98%, #0000) 50% 6px / 92px 24px no-repeat;
+  mask: linear-gradient(#000 12px, #0000 12px);
+  filter: drop-shadow(0 -1px 0 #fff2c0) drop-shadow(0 0 4px rgba(80, 200, 255, .5));
+}
+.sc2-protoss .sc-dialog::after {
+  content: "";
+  left: 20%;
+  right: 20%;
+  bottom: 2px;
+  height: 2px;
+  background: radial-gradient(closest-side, #9ce8ff, rgba(60, 200, 255, .3) 60%, #0000);
+}
+.sc2-protoss .sc-dialog-title {
+  padding-top: 8px;
+  text-shadow: 0 1px 2px #000, 0 0 8px rgba(240, 210, 130, .35);
+}
+
+/* --- Buttons: dark blue bars, gold trim, cyan inner glow ------------- */
+.sc2-protoss .sc-btn {
+  border-radius: 3px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow:
+    inset 0 1px 0 #fff2c080,
+    inset 0 0 0 1px #c09040,
+    inset 0 0 0 2px #050c1c,
+    inset 0 0 9px 1px rgba(60, 190, 255, .3);
+}
+.sc2-protoss .sc-btn::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 2px;
+  height: 1px;
+  background: radial-gradient(closest-side, #8fe4ff, #0000);
+  pointer-events: none;
+}
+.sc2-protoss .sc-btn:hover,
+.sc2-protoss .sc-btn.is-hover {
+  text-shadow: 0 1px 2px #000, 0 0 8px var(--sc-glow);
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 1px #e0b450,
+    inset 0 0 0 2px #050c1c,
+    inset 0 0 14px 2px rgba(80, 210, 255, .55),
+    0 0 8px rgba(60, 190, 255, .45);
+}
+.sc2-protoss .sc-btn:active,
+.sc2-protoss .sc-btn.is-active {
+  box-shadow: inset 0 0 0 1px #8c6224, inset 0 0 0 2px #050c1c, inset 0 2px 8px #000;
+}
+.sc2-protoss .sc-btn:focus-visible {
+  box-shadow: inset 0 0 0 1px #e0b450, inset 0 0 0 2px var(--sc-accent-hi), inset 0 0 12px rgba(80, 210, 255, .5);
+}
+.sc2-protoss .sc-btn:disabled,
+.sc2-protoss .sc-btn.is-disabled { filter: saturate(.25) brightness(.75); }
+
+.sc2-protoss .sc-glue:hover,
+.sc2-protoss .sc-glue.is-hover { text-shadow: 0 1px 2px #000, 0 0 8px var(--sc-glow), 0 0 18px var(--sc-glow); }
+
+/* --- Command card: gold bezel, dark blue glass ---------------------- */
+.sc2-protoss .sc-cmd-btn {
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 2px #c09040,
+    inset 0 -1px 0 2px #6a4614,
+    inset 0 0 0 3px #050c1c,
+    inset 0 0 8px 4px rgba(0, 0, 0, .45);
+}
+.sc2-protoss .sc-cmd-btn:hover,
+.sc2-protoss .sc-cmd-btn.is-hover {
+  box-shadow:
+    inset 0 1px 0 #fff2c0,
+    inset 0 0 0 2px #e0b450,
+    inset 0 0 0 3px #050c1c,
+    inset 0 0 12px 3px rgba(80, 210, 255, .55),
+    0 0 7px rgba(60, 190, 255, .5);
+}
+.sc2-protoss .sc-cmd-btn:active,
+.sc2-protoss .sc-cmd-btn.is-active {
+  box-shadow: inset 0 0 0 2px #8c6224, inset 0 0 0 3px #050c1c, inset 0 2px 10px #000;
+}
+.sc2-protoss .sc-cmd-btn.is-selected {
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 2px #e8fbff,
+    inset 0 0 0 3px #3cc8ff,
+    inset 0 0 14px 4px rgba(120, 230, 255, .75),
+    0 0 9px rgba(120, 230, 255, .7);
+}
+.sc2-protoss .sc-cmd-btn:disabled,
+.sc2-protoss .sc-cmd-btn.is-disabled { filter: saturate(.3) brightness(.7); }
+
+/* --- Lists, tabs, fields -------------------------------------------- */
+.sc2-protoss .sc-list > li:hover { color: #bfefff; }
+.sc2-protoss .sc-list > li.is-selected,
+.sc2-protoss .sc-list > li[aria-selected="true"],
+.sc2-protoss .sc-list > .sc-list-item.is-selected {
+  box-shadow: inset 0 1px 0 rgba(140, 220, 255, .35), inset 0 -1px 0 rgba(0, 0, 0, .5), inset 0 0 10px rgba(60, 190, 255, .25);
+}
+.sc2-protoss .sc-tabs { border-bottom-color: #4a300c; box-shadow: 0 1px 0 #d4a64a; }
+.sc2-protoss .sc-tab {
+  border-radius: 5px 5px 0 0;
+  box-shadow: inset 0 1px 0 #8c6224, inset 1px 0 0 #4a300c, inset -1px 0 0 #4a300c;
+}
+.sc2-protoss .sc-tab.is-active,
+.sc2-protoss .sc-tab[aria-selected="true"] {
+  color: #e8fbff;
+  background: linear-gradient(#2a68ac, #10306a 70%, #0c2654);
+  text-shadow: 0 0 8px var(--sc-glow);
+  box-shadow: inset 0 2px 0 #7fe0ff, inset 1px 0 0 #d4a64a, inset -1px 0 0 #d4a64a, inset 0 0 12px rgba(80, 210, 255, .45);
+}
+.sc2-protoss .sc-check > input[type="radio"] { border-radius: 50%; }
+.sc2-protoss .sc-check > input:checked::after {
+  border-radius: inherit;
+  background: #8fe4ff;
+  box-shadow: 0 0 5px #3cc8ff;
+}
+
+/* --- Console: navy stone body, gold-trimmed swept arcs, crystals ---- */
+.sc2-protoss .sc-console { padding-top: 48px; }
+.sc2-protoss .sc-minimap,
+.sc2-protoss .sc-info,
+.sc2-protoss .sc-portrait { border-radius: 4px; }
+.sc2-protoss .sc-info,
+.sc2-protoss .sc-portrait {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, .07), #0000 40%),
+    radial-gradient(120% 90% at 50% 0, #123266, #06142e 60%, #030a1a);
+}
+.sc2-protoss .sc-console::before {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 37px;
+  --_s: radial-gradient(closest-side, var(--_n) 99%, #0000);
+  background:
+    var(--_s) 50% 13px / 36% 46px,
+    var(--_s) -20px 6px / 230px 74px,
+    var(--_s) right -20px top 6px / 270px 74px,
+    linear-gradient(var(--_n) 0 0) 0 25px / 100% 12px;
+  background-repeat: no-repeat;
+  filter:
+    drop-shadow(0 -1px 0 #e8dcc0) drop-shadow(0 -1px 0 #e8dcc0)
+    drop-shadow(0 -2px 0 #d4a64a) drop-shadow(0 -1px 0 #fff2c0)
+    drop-shadow(0 -1px 0 #2a1806) drop-shadow(0 -2px 5px rgba(60, 190, 255, .35));
+}
+.sc2-protoss .sc-console::after {
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  background:
+    var(--_gem) 50% 4px / 30px 20px,
+    var(--_halo) 50% 0 / 64px 34px,
+    var(--_gem) 83px 0 / 24px 16px,
+    var(--_halo) 71px 0 / 48px 24px,
+    var(--_gem) right 103px top 0 / 24px 16px,
+    var(--_halo) right 91px top 0 / 48px 24px;
+  background-repeat: no-repeat;
+}
