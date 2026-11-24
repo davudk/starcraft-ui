@@ -120,6 +120,11 @@ Skin hooks for shaped parts (all optional):
 
 ## Notes
 
-StarCraft is a trademark of Blizzard Entertainment. This project contains no game assets: all
+Fan-made; not affiliated with or endorsed by Blizzard Entertainment. StarCraft is a trademark of
+Blizzard Entertainment. This project contains no game assets: all
 frames, icons and glyphs are drawn with CSS gradients and small inline SVGs. Supply your own
 wireframes/portraits as `<img>` inside `sc-unit-wire`, `sc-sel`, `sc-portrait`, `sc-cmd-btn`.
+
+## Licence
+
+[MIT](LICENSE)
